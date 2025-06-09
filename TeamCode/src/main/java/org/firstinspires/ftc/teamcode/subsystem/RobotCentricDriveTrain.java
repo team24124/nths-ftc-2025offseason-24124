@@ -60,10 +60,10 @@ public class RobotCentricDriveTrain extends DriveTrain implements TelemetryObser
 
     @Override
     public void updateTelemetry(Telemetry telemetry) {
-        //Pose2d current = getCurrentPose();
+        Pose2d current = getDrive().localizer.getPose();
 
-        //telemetry.addData("X", current.position.x);
-        //telemetry.addData("Y", current.position.y);
-        //telemetry.addData("Heading (°)", Math.toDegrees(current.heading.toDouble()));
+        telemetry.addData("X", current.position.x);
+        telemetry.addData("Y", current.position.y);
+        telemetry.addData("Heading (°)", Math.toDegrees(current.heading.toDouble()));
     }
 }

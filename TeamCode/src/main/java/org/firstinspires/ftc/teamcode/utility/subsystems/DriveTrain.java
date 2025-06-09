@@ -43,14 +43,6 @@ public abstract class DriveTrain implements Subsystem, TelemetryObservable {
      */
     public abstract void drive(double x, double y, double turn);
 
-    /**
-     * @return Last saved pose of the drive train.
-     */
-//    public Pose2d getCurrentPose() {
-//        return drive.getPositionRR();
-//    }
-
-
     public MecanumDrive getDrive(){
         return drive;
     }

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -14,8 +15,8 @@ import org.firstinspires.ftc.teamcode.utility.telemetry.TelemetryObservable;
 @Config
 public class Extension implements Subsystem, TelemetryObservable {
     private final Servo leftExtension, rightExtension;
-    public static double leftLimit = 0, rightLimit = 1;
-    private double currentPosition;
+    public static double leftLimit = 0.5, rightLimit = 0.8;
+    private double currentPosition = 0.5;
 
     public Extension(HardwareMap hw){
         leftExtension = hw.get(Servo.class, "left_extension");
@@ -24,18 +25,25 @@ public class Extension implements Subsystem, TelemetryObservable {
         leftExtension.setDirection(Servo.Direction.REVERSE);
         rightExtension.setDirection(Servo.Direction.FORWARD);
 
-        //leftExtension.scaleRange(leftLimit, rightLimit);
-        //rightExtension.scaleRange(leftLimit, rightLimit);
+        leftExtension.setPosition(leftLimit);
+        rightExtension.setPosition(leftLimit);
     }
 
     public Action toggleExtension(){
-        return new InstantAction(() -> {
-            if(currentPosition != leftLimit){
-                setExtension(rightLimit);
+
+        return (TelemetryPacket packet) -> {
+            if(currentPosition == leftLimit){
+                leftExtension.setPosition(rightLimit);
+                rightExtension.setPosition(rightLimit);
+                currentPosition = rightLimit;
             }else{
-                setExtension(leftLimit);
+                leftExtension.setPosition(leftLimit);
+                rightExtension.setPosition(leftLimit);
+                currentPosition = leftLimit;
             }
-        });
+
+            return false;
+        };
     }
 
     public void setExtension(double position){
@@ -47,7 +55,7 @@ public class Extension implements Subsystem, TelemetryObservable {
 
     @Override
     public void updateTelemetry(Telemetry telemetry) {
-
+        telemetry.addData("Current Position", currentPosition);
     }
 
     @Override
