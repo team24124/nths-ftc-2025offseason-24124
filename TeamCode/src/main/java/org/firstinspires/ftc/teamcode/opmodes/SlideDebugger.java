@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.teamcode.subsystem.Slides;
 
 @Config
-@TeleOp(name = "Slide Debugger", group = "Utilities")
+@TeleOp(name = "Slide Debugger", group = "Utility")
 public class SlideDebugger extends OpMode {
     private DcMotorEx leftSlide, rightSlide;
     private PIDController controller;
@@ -49,9 +49,5 @@ public class SlideDebugger extends OpMode {
 
         telemetry.addData("Position", leftSlide.getCurrentPosition());
         telemetry.addData("Target", target);
-
-//        if(rightSlide.getCurrentPosition() < 500){
-//            rightSlide.setPower(0);
-//        }
     }
 }

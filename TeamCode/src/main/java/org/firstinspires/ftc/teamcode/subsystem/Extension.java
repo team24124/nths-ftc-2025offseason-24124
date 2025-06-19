@@ -15,8 +15,19 @@ import org.firstinspires.ftc.teamcode.utility.telemetry.TelemetryObservable;
 @Config
 public class Extension implements Subsystem, TelemetryObservable {
     private final Servo leftExtension, rightExtension;
-    public static double leftLimit = 0.5, rightLimit = 0.8;
-    private double currentPosition = 0.5;
+
+    public enum State {
+        RETRACTED(0.5),
+        EXTENDED(0.8);
+
+        public final double position;
+
+        State(double position){
+            this.position = position;
+        }
+    }
+
+    private boolean isExtended = false;
 
     public Extension(HardwareMap hw){
         leftExtension = hw.get(Servo.class, "left_extension");
@@ -25,29 +36,36 @@ public class Extension implements Subsystem, TelemetryObservable {
         leftExtension.setDirection(Servo.Direction.REVERSE);
         rightExtension.setDirection(Servo.Direction.FORWARD);
 
-        leftExtension.setPosition(leftLimit);
-        rightExtension.setPosition(leftLimit);
+        setExtension(State.RETRACTED);
     }
 
     public Action toggleExtension(){
-
         return (TelemetryPacket packet) -> {
-            if(currentPosition == leftLimit){
-                leftExtension.setPosition(rightLimit);
-                rightExtension.setPosition(rightLimit);
-                currentPosition = rightLimit;
-            }else{
-                leftExtension.setPosition(leftLimit);
-                rightExtension.setPosition(leftLimit);
-                currentPosition = leftLimit;
+            if(isExtended){
+                setExtension(State.RETRACTED);
+                isExtended = false;
             }
-
+            else {
+                setExtension(State.EXTENDED);
+                isExtended = true;
+            }
             return false;
         };
     }
 
+    public Action extendTo(double position){
+        return (TelemetryPacket packet) -> {
+            setExtension(position);
+            return false;
+        };
+    }
+
+    public void setExtension(State state){
+        leftExtension.setPosition(state.position);
+        rightExtension.setPosition(state.position);
+    }
+
     public void setExtension(double position){
-        currentPosition = position;
         leftExtension.setPosition(position);
         rightExtension.setPosition(position);
     }
@@ -55,7 +73,7 @@ public class Extension implements Subsystem, TelemetryObservable {
 
     @Override
     public void updateTelemetry(Telemetry telemetry) {
-        telemetry.addData("Current Position", currentPosition);
+        telemetry.addData("Current Position", leftExtension.getPosition());
     }
 
     @Override

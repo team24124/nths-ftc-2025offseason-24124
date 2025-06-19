@@ -104,7 +104,7 @@ public class CollectionClaw implements Subsystem, TelemetryObservable {
         };
     }
 
-    public Action setClawPosition(int position){
+    public Action setClawPosition(double position){
         return (TelemetryPacket packet) -> {
             claw.setPosition(position);
             return false;
