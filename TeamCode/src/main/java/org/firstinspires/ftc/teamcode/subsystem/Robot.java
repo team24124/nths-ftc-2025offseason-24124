@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utility.telemetry.TelemetryMaster;
 
 public class Robot {
@@ -16,7 +17,7 @@ public class Robot {
 
     public TelemetryMaster telemetryMaster;
 
-    public Robot(HardwareMap hw) {
+    public Robot(HardwareMap hw, Telemetry telemetry) {
         arm = new Arm(hw);
         collectionClaw = new CollectionClaw(hw);
         controlClaw = new ControlClaw(hw);
@@ -26,6 +27,7 @@ public class Robot {
         Pose2d startPose = new Pose2d(new Vector2d(0, 0), Math.toRadians(0));
         driveTrain = new RobotCentricDriveTrain(hw, startPose);
 
+        telemetryMaster = new TelemetryMaster(telemetry);
         telemetryMaster
                 .subscribe(arm)
                 .subscribe(collectionClaw)

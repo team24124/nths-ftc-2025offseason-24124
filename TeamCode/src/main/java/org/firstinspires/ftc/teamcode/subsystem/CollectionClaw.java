@@ -64,14 +64,14 @@ public class CollectionClaw implements Subsystem, TelemetryObservable {
 
     public CollectionClaw(HardwareMap hw){
         // Pinching Claw
-        claw = hw.get(Servo.class, "collection_claw");
+        claw = hw.get(Servo.class, "bottom_claw");
 
         // Rotational Pivot
-        pivot = hw.get(Servo.class, "collection_pivot");
+        pivot = hw.get(Servo.class, "bottom_pivot");
 
         // Rotational Elbow
-        leftElbow = hw.get(Servo.class, "left_collection_elbow");
-        rightElbow = hw.get(Servo.class, "right_collection_elbow");
+        leftElbow = hw.get(Servo.class, "left_bottom_elbow");
+        rightElbow = hw.get(Servo.class, "right_bottom_elbow");
 
         leftElbow.setDirection(Servo.Direction.REVERSE);
         rightElbow.setDirection(Servo.Direction.FORWARD);
