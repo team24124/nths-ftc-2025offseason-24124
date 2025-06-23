@@ -21,7 +21,7 @@ public class Main extends OpMode {
 
     @Override
     public void init() {
-        robot = new Robot(hardwareMap);
+        robot = new Robot(hardwareMap, telemetry);
         actions = ActionScheduler.INSTANCE;
     }
 
@@ -32,6 +32,9 @@ public class Main extends OpMode {
         double rx = gamepad1.right_stick_x;
 
         if(gamepad1.a) actions.schedule(robot.extension.toggleExtension());
+        if(gamepad1.b) actions.schedule(robot.collectionClaw.setElbowPosition(0));
+        if(gamepad1.x) actions.schedule(robot.collectionClaw.setElbowPosition(0.5));
+        if(gamepad1.y) actions.schedule(robot.collectionClaw.setElbowPosition(1.0));
 
         robot.driveTrain.drive(x, y, rx);
         robot.telemetryMaster.update(); // Update telemetry

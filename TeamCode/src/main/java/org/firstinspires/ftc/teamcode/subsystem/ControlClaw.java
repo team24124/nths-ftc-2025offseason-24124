@@ -64,14 +64,14 @@ public class ControlClaw implements Subsystem, TelemetryObservable {
 
     public ControlClaw(HardwareMap hw){
         // Pinching Claw
-        claw = hw.get(Servo.class, "control_claw");
+        claw = hw.get(Servo.class, "top_claw");
 
         // Rotational Pivot
-        pivot = hw.get(Servo.class, "control_pivot");
+        pivot = hw.get(Servo.class, "top_pivot");
 
         // Rotational Elbow
-        leftElbow = hw.get(Servo.class, "left_control_elbow");
-        rightElbow = hw.get(Servo.class, "right_control_elbow");
+        leftElbow = hw.get(Servo.class, "left_top_elbow");
+        rightElbow = hw.get(Servo.class, "right_top_elbow");
 
         leftElbow.setDirection(Servo.Direction.REVERSE);
         rightElbow.setDirection(Servo.Direction.FORWARD);
@@ -104,7 +104,7 @@ public class ControlClaw implements Subsystem, TelemetryObservable {
         };
     }
 
-    public Action setClawPosition(int position){
+    public Action setClawPosition(double position){
         return (TelemetryPacket packet) -> {
             claw.setPosition(position);
             return false;

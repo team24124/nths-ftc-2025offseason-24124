@@ -32,7 +32,7 @@ public class Arm implements Subsystem, TelemetryObservable {
     public Arm(HardwareMap hw){
         armMotor = hw.get(DcMotorEx.class, "arm");
         armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         current = State.HOME;
     }
@@ -69,6 +69,14 @@ public class Arm implements Subsystem, TelemetryObservable {
 
             return false;
         };
+    }
+
+    /**
+     * Stop and reset all used motors. Sets motor's RunMode to RUN_USING_ENCODER after.
+     */
+    public void stopAndResetEncoders() {
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public State getCurrentState(){
