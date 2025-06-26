@@ -14,19 +14,28 @@ public class SampleStaticLL extends LinearOpMode {
     DcMotor front_right_motor;
     DcMotor back_left_motor;
     DcMotor back_right_motor;
+    private DcMotor arm;
     Limelight3A limelight;
-    //private Servo wrist;
-    private Servo extension_right;
-    private Servo extension_left;
-    //private Servo intake;
+    private Servo left_extension;
+    private Servo right_extension;
+    private Servo left_bottom_elbow;
+    private Servo right_bottom_elbow;
+    private Servo bottom_pivot;
+    private Servo bottom_claw;
+    private Servo top_pivot;
+    private Servo top_claw;
     double kP = 0.004; // Tune this proportional constant
     @Override
     public void runOpMode() {
-        //limelight initiation & wrist/intake
-        //wrist = hardwareMap.get(Servo.class, "wrist");
-        //intake = hardwareMap.get(Servo.class, "intake");
-        extension_left = hardwareMap.get(Servo.class, "left_extension");
-        extension_right = hardwareMap.get(Servo.class, "right_extension");
+        left_extension = hardwareMap.get(Servo.class, "left_extension");
+        right_extension = hardwareMap.get(Servo.class, "right_extension");
+        left_bottom_elbow = hardwareMap.get(Servo.class, "left_bottom_elbow");
+        right_bottom_elbow = hardwareMap.get(Servo.class, "right_bottom_elbow");
+        bottom_pivot = hardwareMap.get(Servo.class, "bottom_pivot");
+        bottom_claw = hardwareMap.get(Servo.class, "bottom_claw");
+        top_pivot = hardwareMap.get(Servo.class, "top_pivot");
+        top_claw = hardwareMap.get(Servo.class, "top_claw");
+
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         if (limelight.getStatus().getPipelineIndex() != 4) {
             limelight.pipelineSwitch(4); // Switch to pipeline number 0
@@ -36,9 +45,9 @@ public class SampleStaticLL extends LinearOpMode {
         front_right_motor = hardwareMap.get(DcMotor.class, "right_front");
         back_left_motor = hardwareMap.get(DcMotor.class, "left_back");
         back_right_motor = hardwareMap.get(DcMotor.class, "right_back");
+        arm = hardwareMap.get(DcMotor.class, "arm");
 
-
-        // Set the motors to run without encoders for free movement (edit for fun or if needed)
+        // Set the motors to run without encoders for free movement
         front_left_motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         front_right_motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         back_left_motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -49,13 +58,15 @@ public class SampleStaticLL extends LinearOpMode {
         back_right_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         back_right_motor.setDirection(DcMotorSimple.Direction.REVERSE);
         front_right_motor.setDirection(DcMotorSimple.Direction.REVERSE);
-        extension_left.setDirection(Servo.Direction.REVERSE);
+        left_extension.setDirection(Servo.Direction.REVERSE);
 
         // Wait for game to start
         waitForStart();
         limelight.start();
         // Main loops
         while (opModeIsActive()) {
+            telemetry.addData("elbowpos", left_bottom_elbow.getPosition());
+            telemetry.update();
             if (limelight.isRunning()) {
                 if (limelight.getLatestResult() != null) {
 
@@ -78,16 +89,23 @@ public class SampleStaticLL extends LinearOpMode {
                         double targetX = array[1];
                         double targetY = array[2];
                         double angle = array[3];
-                        double strafeX = (targetX - 155) * kP;
-                        double strafeY = (targetY - 213) * kP;
+                        double strafeX = (targetX - 83) * kP;
+                        double strafeY = (targetY - 265) * kP;
+                        telemetry.update();
 
-                        while (targetX < 150 || targetX > 160 || targetY < 208 || targetY > 218) {
+                        while (targetX < 78 || targetX > 88 || targetY < 260 || targetY > 270) {
+                            telemetry.update();
 
                             array = limelight.getLatestResult().getPythonOutput();
                             targetX = array[1];
                             targetY = array[2];
-                            strafeX = (targetX - 155) * kP;
-                            strafeY = (targetY - 213) * kP;
+                            angle = array[3];
+                            strafeX = (targetX - 83) * kP;
+                            strafeY = (targetY - 265) * kP;
+
+                            if (array == null) {
+                                break;
+                            }
 
                             double baseX = 0;
                             double baseY = 0;
@@ -114,34 +132,43 @@ public class SampleStaticLL extends LinearOpMode {
                             back_right_motor.setPower(backRightPower);
 
 
-                            if (targetX > 150 && targetX < 160 && targetY > 208 && targetY < 218) {
-                                extension_left.setPosition(0.66);
-                                extension_right.setPosition(0.66);
+                            if (targetX > 78 && targetX < 88 && targetY > 260 && targetY < 270) {
+                                front_left_motor.setPower(0);
+                                front_right_motor.setPower(0);
+                                back_left_motor.setPower(0);
+                                back_right_motor.setPower(0);
+                                left_extension.setPosition(0.662);
+                                right_extension.setPosition(0.662);
                                 if (angle < 0) {
                                     angle = -angle;
                                 }
-                                //telemetry.addData("wristpos", wrist.getPosition());
-                                //telemetry.update();
                                 //right tilt is 90 to 180
                                 //left tilt is 0 to 90
-                                //wrist.setPosition(((double) 1 /180) * angle);  //if ll is attached static
+                                bottom_pivot.setPosition(((double) 1 /180) * angle);  //if ll is attached static
 
-                                //SET WRIST TO DOWN POSITION
-                                //SET CLAW TO CLOSED
-                                //SET WRIST TO UP POSITION
-                                //BRING SLIDE BACK
-                                break;
+                                while (true) {
+                                    left_bottom_elbow.setPosition(0.14);
+                                    right_bottom_elbow.setPosition(0.14);
+                                    bottom_claw.setPosition(0.6);
+                                    if (left_bottom_elbow.getPosition() < 0.16) {
+                                        bottom_claw.setPosition(0.85);
+                                        sleep(50);
+                                        left_bottom_elbow.setPosition(0.83);
+                                        right_bottom_elbow.setPosition(0.83);
+                                        bottom_pivot.setPosition(0.14);
+                                        left_extension.setPosition(0.5);
+                                        right_extension.setPosition(0.5);
+                                        break;
+                                    }
+                                }
+                                top_pivot.setPosition(1);
                             }
                         }
-
                         front_left_motor.setPower(0);
                         front_right_motor.setPower(0);
                         back_left_motor.setPower(0);
                         back_right_motor.setPower(0);
                     }
-
-
-
                 }
             }
         }
