@@ -17,7 +17,7 @@ public class Extension implements Subsystem, TelemetryObservable {
     private final Servo leftExtension, rightExtension;
 
     public enum State {
-        RETRACTED(0.5),
+        RETRACTED(0.48),
         EXTENDED(0.8);
 
         public final double position;

@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -32,6 +34,7 @@ public class Slides implements Subsystem, TelemetryObservable {
     // TODO: Tune these positions (maybe)
     public enum State {
         HOME(0),
+        PASSTHROUGH(400),
         ACTIVE(750), // 380
         //INBETWEEN(800),
         //HOVER(1200), // 760
@@ -56,6 +59,14 @@ public class Slides implements Subsystem, TelemetryObservable {
     public Slides(HardwareMap hw){
         leftSlide = hw.get(DcMotorEx.class, "left_slide");
         rightSlide = hw.get(DcMotorEx.class, "right_slide");
+
+        rightSlide.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         voltageSensor = hw.get(VoltageSensor.class, "Control Hub");
         controller = new PIDController(coefficients.p, coefficients.i, coefficients.d);
@@ -91,7 +102,7 @@ public class Slides implements Subsystem, TelemetryObservable {
     public Action moveTo(int target) {
         return (TelemetryPacket packet) -> {
             int slidePos = leftSlide.getCurrentPosition();
-            double tolerance = 0.01 * target + 10; // Check if we are within 1% of the target, with a constant of 1
+            double tolerance = 0.1 * target + 10; // Check if we are within 1% of the target, with a constant of 1
 
             double p = coefficients.p, i = coefficients.i, d = coefficients.d, f = coefficients.f;
 

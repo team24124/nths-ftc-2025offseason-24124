@@ -11,9 +11,15 @@ public enum ActionScheduler {
     INSTANCE;
 
     private List<Action> runningActions = new ArrayList<>();
+    private boolean isStopRequested = false;
 
     public void schedule(Action action){
         runningActions.add(action);
+    }
+
+    public void init(){
+        isStopRequested = false;
+        runningActions.clear();
     }
 
     public void run(){
@@ -22,11 +28,16 @@ public enum ActionScheduler {
         List<Action> newActions = new ArrayList<>();
         for (Action action : runningActions) {
             action.preview(packet.fieldOverlay());
-            if (action.run(packet)) {
+            if (action.run(packet) && !isStopRequested) {
                 newActions.add(action);
             }
         }
         runningActions = newActions;
         FtcDashboard.getInstance().sendTelemetryPacket(packet);
+    }
+
+    public void stop(){
+        isStopRequested = true;
+        runningActions.clear();
     }
 }

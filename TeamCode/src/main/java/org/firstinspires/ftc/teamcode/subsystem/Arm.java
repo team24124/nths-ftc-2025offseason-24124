@@ -12,13 +12,12 @@ import org.firstinspires.ftc.teamcode.utility.subsystems.Subsystem;
 import org.firstinspires.ftc.teamcode.utility.telemetry.TelemetryObservable;
 
 public class Arm implements Subsystem, TelemetryObservable {
-    private final DcMotorEx armMotor;
+    public final DcMotorEx armMotor;
 
-    // TODO: Tune these positions
     public enum State {
         HOME(0),
-        PASSTHROUGH(300),
-        ACTIVE(600);
+        PASSTHROUGH(170),
+        ACTIVE(-100);
 
         public final int position;
 
@@ -32,8 +31,13 @@ public class Arm implements Subsystem, TelemetryObservable {
     public Arm(HardwareMap hw){
         armMotor = hw.get(DcMotorEx.class, "arm");
         armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armMotor.setTargetPosition(State.HOME.position);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotor.setPower(0.5);
+
         current = State.HOME;
     }
 

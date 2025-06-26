@@ -14,10 +14,9 @@ public class CollectionClaw implements Subsystem, TelemetryObservable {
     private final Servo pivot, claw;
     private final Servo leftElbow, rightElbow;
 
-    // TODO: Tune these positions
     public enum ClawState { // Accepts values between 0.5 and 1.0
-        CLOSED(0),
-        OPEN(0.5);
+        CLOSED(0.8),
+        OPEN(1.0);
 
         public final double position;
 
@@ -26,7 +25,6 @@ public class CollectionClaw implements Subsystem, TelemetryObservable {
         }
     }
 
-    // TODO: Tune these positions
     public enum PivotState {
         THIRTY(0),
         SIXTY(0.1),
@@ -46,10 +44,9 @@ public class CollectionClaw implements Subsystem, TelemetryObservable {
         }
     }
 
-    // TODO: Tune these positions
     public enum ElbowState {
-        PASSTHROUGH(0),
-        ACTIVE(0.5);
+        PASSTHROUGH(0.85),
+        ACTIVE(0.17);
 
         public final double position;
 
@@ -58,7 +55,7 @@ public class CollectionClaw implements Subsystem, TelemetryObservable {
         }
     }
 
-    private final ArraySelect<PivotState> pivotStates = new ArraySelect<>(PivotState.values());
+    public final ArraySelect<PivotState> pivotStates = new ArraySelect<>(PivotState.values());
     private boolean isClawOpen = true;
 
 
@@ -89,9 +86,17 @@ public class CollectionClaw implements Subsystem, TelemetryObservable {
         };
     }
 
-    public Action rotatePivot(){
+    public Action nextPivot(){
         return (TelemetryPacket packet) -> {
             pivotStates.next(); // Advance the pivot to the next rotation
+            pivot.setPosition(pivotStates.getSelected().position); // Set the position of the servo
+            return false;
+        };
+    }
+
+    public Action prevPivot(){
+        return (TelemetryPacket packet) -> {
+            pivotStates.previous(); // Advance the pivot to the next rotation
             pivot.setPosition(pivotStates.getSelected().position); // Set the position of the servo
             return false;
         };

@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.gamepad.ButtonReader;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -24,26 +27,55 @@ public class ComponentDebugger extends OpMode {
     public static int motorArm = 0;
     public static int slideTarget = 0;
 
+    boolean right_bumper_just_pressed = false;
+    GamepadEx gamepadEx1;
+    GamepadEx gamepadEx2;
 
     @Override
     public void init() {
+        gamepadEx1 = new GamepadEx(gamepad1);
+        gamepadEx2 = new GamepadEx(gamepad2);
         robot = new Robot(hardwareMap, telemetry);
         actions = ActionScheduler.INSTANCE;
     }
 
     @Override
     public void loop() {
+        if(gamepad1.right_bumper && !right_bumper_just_pressed){
+            right_bumper_just_pressed = true;
+        }
+
         if(gamepad1.a) actions.schedule(robot.collectionClaw.setElbowPosition(bottomElbow));
         if(gamepad1.b) actions.schedule(robot.collectionClaw.setClawPosition(bottomClaw));
-        if(gamepad1.x) actions.schedule(robot.collectionClaw.rotatePivot());
+
+        if(gamepadEx1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)){
+            actions.schedule(robot.collectionClaw.prevPivot());
+        }
+
+        if(gamepadEx1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)){
+            actions.schedule(robot.collectionClaw.nextPivot());
+        }
+
+
+
         if(gamepad1.y) actions.schedule(robot.arm.moveTo(motorArm));
 
         if(gamepad1.dpad_left) actions.schedule(robot.extension.extendTo(extension));
 
         if(gamepad2.a) actions.schedule(robot.controlClaw.setElbowPosition(topElbow));
         if(gamepad2.b) actions.schedule(robot.controlClaw.setClawPosition(topClaw));
-        if(gamepad2.x) actions.schedule(robot.controlClaw.rotatePivot());
+        if(gamepadEx2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)){
+            actions.schedule(robot.controlClaw.prevPivot());
+        }
+
+        if(gamepadEx2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)){
+            actions.schedule(robot.controlClaw.nextPivot());
+        }
         if(gamepad2.y) actions.schedule(robot.slides.moveTo(slideTarget));
+
+        gamepadEx1.readButtons();
+        gamepadEx2.readButtons();
+        actions.run();
 
         // Telemetry
         telemetry.addLine("GAMEPAD_ONE");
@@ -52,12 +84,14 @@ public class ComponentDebugger extends OpMode {
         telemetry.addData("X", "Bottom Pivot");
         telemetry.addData("Y", "Arm");
         telemetry.addData("DPAD_LEFT", "Extension");
+        telemetry.addData("Current Rotation", robot.collectionClaw.pivotStates.getSelected());
         telemetry.addLine();
         telemetry.addLine("GAMEPAD_TWO");
         telemetry.addData("A", "Top Elbow");
         telemetry.addData("B", "Top Claw");
         telemetry.addData("X", "Top Pivot");
         telemetry.addData("Y", "Slides");
-
+        telemetry.addLine();
+        telemetry.addData("Arm Pos.", robot.arm.armMotor.getCurrentPosition());
     }
 }
