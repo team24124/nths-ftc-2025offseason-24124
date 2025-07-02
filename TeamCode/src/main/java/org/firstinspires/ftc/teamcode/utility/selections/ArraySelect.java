@@ -83,5 +83,11 @@ public class ArraySelect<T> implements Selector<T> {
         currentIndex = index;
     }
 
+    public void setSelected(T state){
+        for(int i = 0; i < options.length; i++){
+            if(options[i] == state) setSelected(i);
+        }
+    }
+
 
 }

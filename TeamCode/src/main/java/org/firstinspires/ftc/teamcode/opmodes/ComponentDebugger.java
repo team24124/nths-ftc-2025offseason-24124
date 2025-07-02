@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.subsystem.CollectionClaw;
 import org.firstinspires.ftc.teamcode.subsystem.ControlClaw;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
+import org.firstinspires.ftc.teamcode.subsystem.Slides;
 import org.firstinspires.ftc.teamcode.utility.ActionScheduler;
 
 @Config
@@ -25,7 +26,7 @@ public class ComponentDebugger extends OpMode {
     public static double extension = 0.5;
 
     public static int motorArm = 0;
-    public static int slideTarget = 0;
+    public static Slides.State slideTarget = Slides.State.HOME;
 
     boolean right_bumper_just_pressed = false;
     GamepadEx gamepadEx1;
@@ -71,10 +72,11 @@ public class ComponentDebugger extends OpMode {
         if(gamepadEx2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)){
             actions.schedule(robot.controlClaw.nextPivot());
         }
-        if(gamepad2.y) actions.schedule(robot.slides.moveTo(slideTarget));
+        if(gamepad2.y) actions.schedule(robot.slides.setStateTo(slideTarget));
 
         gamepadEx1.readButtons();
         gamepadEx2.readButtons();
+        robot.slides.periodic();
         actions.run();
 
         // Telemetry

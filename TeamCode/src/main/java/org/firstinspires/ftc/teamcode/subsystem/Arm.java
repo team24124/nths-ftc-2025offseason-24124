@@ -41,6 +41,7 @@ public class Arm implements Subsystem, TelemetryObservable {
         current = State.HOME;
     }
 
+
     /**
      * Move the arm to a given target position as a RoadRunner action.
      *
@@ -85,6 +86,10 @@ public class Arm implements Subsystem, TelemetryObservable {
 
     public State getCurrentState(){
         return current;
+    }
+
+    public double getFudgeFactor(){
+        return 100;
     }
 
     @Override

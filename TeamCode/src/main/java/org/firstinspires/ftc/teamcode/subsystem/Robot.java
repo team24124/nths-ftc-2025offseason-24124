@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -22,6 +21,9 @@ public class Robot {
 
     public TelemetryMaster telemetryMaster;
 
+    private boolean isExtended = false;
+    private boolean isInScoringMode = false;
+
     public Robot(HardwareMap hw, Telemetry telemetry) {
         arm = new Arm(hw);
         collectionClaw = new CollectionClaw(hw);
@@ -42,7 +44,16 @@ public class Robot {
                 .subscribe(driveTrain);
     }
 
+    public boolean isExtended(){
+        return isExtended;
+    }
+
+    public boolean isInScoringMode(){
+        return isInScoringMode;
+    }
+
     public Action extendCollection(){
+        isExtended = true;
         return new SequentialAction(
                 collectionClaw.setPivotPosition(CollectionClaw.PivotState.ONEEIGHTY),
                 collectionClaw.setClawPosition(CollectionClaw.ClawState.OPEN),
@@ -55,6 +66,7 @@ public class Robot {
     }
 
     public Action retractCollection(){
+        isExtended = false;
         return new SequentialAction(
                 collectionClaw.setClawPosition(CollectionClaw.ClawState.CLOSED),
                 new SleepAction(0.1),
@@ -66,11 +78,12 @@ public class Robot {
         );
     }
 
-    public Action collectControl(){
+    public Action collectFromPassthrough(){
+        isInScoringMode = false;
         return new SequentialAction(
                 controlClaw.setPivotPosition(ControlClaw.PivotState.TWOSEVENTY),
                 controlClaw.setClawPosition(ControlClaw.ClawState.OPEN),
-                slides.moveTo(Slides.State.PASSTHROUGH.position),
+                slides.setStateTo(Slides.State.PASSTHROUGH),
                 arm.moveTo(Arm.State.PASSTHROUGH),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.PASSTHROUGH),
                 new SleepAction(0.3),
@@ -79,14 +92,50 @@ public class Robot {
         );
     }
 
-    public Action activeControl(){
+    public Action collectFromWall(){
+        isInScoringMode = false;
         return new SequentialAction(
                 collectionClaw.setClawPosition(CollectionClaw.ClawState.OPEN),
                 new SleepAction(0.2),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.ACTIVE),
                 arm.moveTo(Arm.State.ACTIVE),
                 new SleepAction(0.1),
-                controlClaw.setClawPosition(ControlClaw.ClawState.CLOSED)
+                controlClaw.setClawPosition(ControlClaw.ClawState.CLOSED),
+                controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY)
+        );
+    }
+
+    public Action passthrough(){
+        return new SequentialAction(
+                new ParallelAction(
+                        retractCollection(),
+                        resetControlArm()
+                ),
+                new SleepAction(0.8),
+                collectFromPassthrough(),
+                new SleepAction(0.4),
+                collectFromWall()
+        );
+    }
+
+    public Action moveToScore(){
+        isInScoringMode = true;
+        return new SequentialAction(
+                controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
+                controlClaw.setClawPosition(ControlClaw.ClawState.CLOSED),
+                controlClaw.setElbowPosition(ControlClaw.ElbowState.SCORE),
+                arm.moveTo(Arm.State.PASSTHROUGH),
+                slides.setStateTo(Slides.State.HIGH_RUNG)
+        );
+    }
+
+    public Action resetControlArm(){
+        return new SequentialAction(
+                arm.moveTo(Arm.State.HOME),
+                slides.setStateTo(Slides.State.PASSTHROUGH),
+                controlClaw.setClawPosition(ControlClaw.ClawState.OPEN),
+                controlClaw.setElbowPosition(ControlClaw.ElbowState.PASSTHROUGH),
+                controlClaw.setPivotPosition(ControlClaw.PivotState.TWOSEVENTY)
         );
     }
 }

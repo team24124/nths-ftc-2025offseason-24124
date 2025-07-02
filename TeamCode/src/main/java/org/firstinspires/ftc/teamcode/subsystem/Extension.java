@@ -27,8 +27,6 @@ public class Extension implements Subsystem, TelemetryObservable {
         }
     }
 
-    private boolean isExtended = false;
-
     public Extension(HardwareMap hw){
         leftExtension = hw.get(Servo.class, "left_extension");
         rightExtension = hw.get(Servo.class, "right_extension");
@@ -37,20 +35,6 @@ public class Extension implements Subsystem, TelemetryObservable {
         rightExtension.setDirection(Servo.Direction.FORWARD);
 
         setExtension(State.RETRACTED);
-    }
-
-    public Action toggleExtension(){
-        return (TelemetryPacket packet) -> {
-            if(isExtended){
-                setExtension(State.RETRACTED);
-                isExtended = false;
-            }
-            else {
-                setExtension(State.EXTENDED);
-                isExtended = true;
-            }
-            return false;
-        };
     }
 
     public Action extendTo(double position){

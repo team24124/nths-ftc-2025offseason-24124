@@ -21,7 +21,6 @@ public class Slides implements Subsystem, TelemetryObservable {
     private final DcMotorEx leftSlide, rightSlide;
     private final PIDController controller;
     private final VoltageSensor voltageSensor;
-    private boolean startFlag = false;
 
     public static int target = 0;
     public static PIDFCoefficients coefficients = new PIDFCoefficients(
@@ -74,7 +73,7 @@ public class Slides implements Subsystem, TelemetryObservable {
 
     @Override
     public void periodic() {
-        if (!startFlag) return;
+        target = positions.getSelected().position;
         double p = coefficients.p;
         double i = coefficients.i;
         double d = coefficients.d;
@@ -87,10 +86,27 @@ public class Slides implements Subsystem, TelemetryObservable {
 
         leftSlide.setPower(power);
         rightSlide.setPower(power);
+    }
 
-        if(rightSlide.getCurrentPosition() < 500 && positions.getSelected() == State.HOME){
-            rightSlide.setPower(0);
-        }
+    public Action setStateTo(State state){
+        return (TelemetryPacket packet) -> {
+            positions.setSelected(state);
+            return false;
+        };
+    }
+
+    public Action nextPos(){
+        return (TelemetryPacket packet) -> {
+            positions.next();
+            return false;
+        };
+    }
+
+    public Action prevPos(){
+        return (TelemetryPacket packet) -> {
+            positions.previous();
+            return false;
+        };
     }
 
     /**
@@ -145,13 +161,6 @@ public class Slides implements Subsystem, TelemetryObservable {
         rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
-
-    /**
-     * Set the slides start flag to true to start incorporating periodic PIDF control
-     */
-    public void triggerStartFlag() {
-        startFlag = true;
     }
 
 
