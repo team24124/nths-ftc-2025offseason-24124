@@ -24,6 +24,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 @Autonomous(name = "AutoRed", group = "Autonomous")
 public class AutoRed extends LinearOpMode {
+    public double VALUE = 0;
     public class servoControl {
         private DcMotor arm, left_slide, right_slide;
         private Servo left_extension, right_extension, left_bottom_elbow, right_bottom_elbow, left_top_elbow, right_top_elbow, bottom_pivot, bottom_claw, top_pivot, top_claw;
@@ -63,8 +64,8 @@ public class AutoRed extends LinearOpMode {
                     left_top_elbow.setPosition(VALUE);
                     right_top_elbow.setPosition(VALUE);
                     top_pivot.setPosition(VALUE);
-                    left_slide.setTargetPosition(VALUE);
-                    right_slide.setTargetPosition(VALUE);
+//                    left_slide.setTargetPosition(VALUE);
+//                    right_slide.setTargetPosition(VALUE);
                     initialized = true;
                 }
 
@@ -74,8 +75,8 @@ public class AutoRed extends LinearOpMode {
                     return true;
                 } else {
                     arm.setPower(VALUE);
-                    left_slide.setTargetPosition(VALUE);
-                    right_slide.setTargetPosition(VALUE);
+//                    left_slide.setTargetPosition(VALUE);
+//                    right_slide.setTargetPosition(VALUE);
                     top_claw.setPosition(VALUE);
                     return false;
                 }
