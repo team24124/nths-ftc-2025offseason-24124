@@ -72,32 +72,37 @@ public class SampleStaticNeuralLL extends LinearOpMode {
             if (limelight.isRunning()) {
                 if (limelight.getLatestResult() != null) {
                     List<LLResultTypes.DetectorResult> detections = result.getDetectorResults();
-                    String className = detections.get(0).getClassName();
-                    double x = detections.get(0).getTargetXDegrees();
-                    double y = detections.get(0).getTargetYDegrees();
-                    List<List<Double>> corners = detections.get(0).getTargetCorners();
+                    for (LLResultTypes.DetectorResult detection : detections) {
+                        String className = detection.getClassName();
+                        double x = detection.getTargetXDegrees();
+                        double y = detection.getTargetYDegrees();
+                        List<List<Double>> corners = detection.getTargetCorners();
 
-                    double zeroX = corners.get(0).get(0); //x of 0
-                    double zeroY = corners.get(0).get(1); //y of 0
-                    double oneX = corners.get(1).get(0); //x of 1
-                    double threeY = corners.get(3).get(1); //y of 3
+                        double zeroX = corners.get(0).get(0); //x of 0
+                        double zeroY = corners.get(0).get(1); //y of 0
+                        double oneX = corners.get(1).get(0); //x of 1
+                        double threeY = corners.get(3).get(1); //y of 3
 
-                    double width = zeroX - oneX;
+                        double width = zeroX - oneX;
 
-                    double length = zeroY - threeY;
+                        double length = zeroY - threeY;
 
-                    double ratio = width / length;
+                        double ratio = width / length;
 
-                    telemetry.addData(String.valueOf(ratio), " width: " + width + " length: " + length);
-                    telemetry.update();
+                        telemetry.addData(String.valueOf(ratio), " width: " + width + " length: " + length);
+                        telemetry.update();
 
-                    if (gamepad1.b) {
-                        if (ratio < 1) {
-                            bottom_claw.setPosition(0.2);
-                        } else {
-                            bottom_claw.setPosition(0.8);
+                        if (gamepad1.b) {
+                            if (ratio < 1) {
+                                bottom_claw.setPosition(0.2);
+                            } else {
+                                bottom_claw.setPosition(0.8);
+                            }
                         }
                     }
+
+
+
 
 
 
