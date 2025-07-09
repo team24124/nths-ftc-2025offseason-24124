@@ -84,7 +84,7 @@ public class Robot {
         return new SequentialAction(
                 controlClaw.setPivotPosition(ControlClaw.PivotState.TWOSEVENTY),
                 controlClaw.setClawPosition(ControlClaw.ClawState.OPEN),
-                slides.setStateTo(Slides.State.PASSTHROUGH),
+                slides.moveTo(Slides.State.PASSTHROUGH.position),
                 arm.moveTo(Arm.State.PASSTHROUGH),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.PASSTHROUGH),
                 new SleepAction(0.3),
@@ -126,14 +126,14 @@ public class Robot {
                 controlClaw.setClawPosition(ControlClaw.ClawState.CLOSED),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.SCORE),
                 arm.moveTo(Arm.State.SCORE),
-                slides.setStateTo(Slides.State.HIGH_RUNG)
+                slides.moveTo(Slides.State.HIGH_RUNG.position)
         );
     }
 
     public Action resetControlArm(){
         return new SequentialAction(
                 arm.moveTo(Arm.State.HOME),
-                slides.setStateTo(Slides.State.PASSTHROUGH),
+                slides.moveTo(Slides.State.PASSTHROUGH.position),
                 controlClaw.setClawPosition(ControlClaw.ClawState.OPEN),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.PASSTHROUGH),
                 controlClaw.setPivotPosition(ControlClaw.PivotState.TWOSEVENTY)
