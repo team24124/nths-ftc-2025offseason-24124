@@ -64,6 +64,7 @@ public class RobotCentricDriveTrain extends DriveTrain implements TelemetryObser
 
         telemetry.addData("X", current.position.x);
         telemetry.addData("Y", current.position.y);
-        telemetry.addData("Heading (°)", Math.toDegrees(current.heading.toDouble()));
+        telemetry.addData("Heading (°)", current.heading.toDouble());
+        telemetry.addData("Heading (°)", Math.toRadians(current.heading.toDouble()));
     }
 }

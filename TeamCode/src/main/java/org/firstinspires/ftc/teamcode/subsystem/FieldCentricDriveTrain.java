@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utility.subsystems.DriveTrain;
@@ -12,8 +14,19 @@ import org.firstinspires.ftc.teamcode.utility.telemetry.TelemetryObservable;
  * @see <a href="https://compendium.readthedocs.io/en/latest/_images/centric.png"> Robot Centric vs. Field Centric </a>
  */
 public class FieldCentricDriveTrain extends DriveTrain implements TelemetryObservable {
+
+    // Retrieve the IMU from the hardware map
+    private IMU imu;
+    // Adjust the orientation parameters to match your robot
+
     public FieldCentricDriveTrain(HardwareMap hw, Pose2d start) {
         super(hw, start);
+//        imu = hw.get(IMU.class, "imu");
+//        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+//                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+//                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
+//        // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
+//        imu.initialize(parameters);
     }
 
     /**
@@ -24,7 +37,7 @@ public class FieldCentricDriveTrain extends DriveTrain implements TelemetryObser
      */
     @Override
     public void drive(double x, double y, double rx) {
-        double botHeading = getHeading();
+        double botHeading = getDrive().localizer.getPose().heading.toDouble();
 
         // Rotate the movement direction counter to the bot's rotation
         double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
@@ -44,14 +57,24 @@ public class FieldCentricDriveTrain extends DriveTrain implements TelemetryObser
         //ArraySelect<Double> speeds = getSpeeds();
         super.setDrivePowers(
                 frontLeftPower,
-                backLeftPower,
                 frontRightPower,
+                backLeftPower,
                 backRightPower
         );
     }
 
     @Override
-    public void updateTelemetry(Telemetry telemetry) {
+    public void periodic(){
+        getDrive().updatePoseEstimate();
+    }
 
+    @Override
+    public void updateTelemetry(Telemetry telemetry) {
+        Pose2d current = getDrive().localizer.getPose();
+
+        telemetry.addData("X", current.position.x);
+        telemetry.addData("Y", current.position.y);
+        telemetry.addData("Heading (°)", current.heading.toDouble());
+        telemetry.addData("Heading (°)", Math.toRadians(current.heading.toDouble()));
     }
 }

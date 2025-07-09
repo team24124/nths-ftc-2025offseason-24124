@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger;
@@ -38,6 +40,11 @@ public class Main extends OpMode {
             }else{
                 actions.schedule(robot.passthrough());
             }
+        }
+
+        if(driver.wasJustPressed(Button.START)) {
+            Vector2d current = robot.driveTrain.getDrive().localizer.getPose().position;
+            robot.driveTrain.getDrive().localizer.setPose(new Pose2d(current, 0));
         }
 
         if(driver.wasJustPressed(Button.X)){
