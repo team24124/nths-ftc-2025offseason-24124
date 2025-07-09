@@ -17,7 +17,8 @@ public class Arm implements Subsystem, TelemetryObservable {
     public enum State {
         HOME(0),
         PASSTHROUGH(170),
-        ACTIVE(-100);
+        SCORE(250),
+        ACTIVE(-180);
 
         public final int position;
 
@@ -52,7 +53,7 @@ public class Arm implements Subsystem, TelemetryObservable {
         return (TelemetryPacket packet) -> {
             armMotor.setTargetPosition(target);
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            armMotor.setPower(0.5);
+            armMotor.setPower(0.8);
 
             return false;
         };
@@ -89,7 +90,7 @@ public class Arm implements Subsystem, TelemetryObservable {
     }
 
     public double getFudgeFactor(){
-        return 100;
+        return 200;
     }
 
     @Override

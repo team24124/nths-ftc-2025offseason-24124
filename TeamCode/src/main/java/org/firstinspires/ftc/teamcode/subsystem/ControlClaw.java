@@ -46,7 +46,7 @@ public class ControlClaw implements Subsystem, TelemetryObservable {
 
     public enum ElbowState {
         PASSTHROUGH(0.12),
-        SCORE(0.4),
+        SCORE(0.5),
         ACTIVE(0.8);
 
         public final double position;

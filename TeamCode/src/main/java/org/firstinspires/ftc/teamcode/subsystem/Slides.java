@@ -39,7 +39,7 @@ public class Slides implements Subsystem, TelemetryObservable {
         //HOVER(1200), // 760
         CLIPPER(1600), //1650
         //HANG(2650), // 1700
-        HIGH_RUNG(3700), // 2000
+        HIGH_RUNG(4800), // 2000
         //CLIP_HANG(5000), //3200
         CLIP_HIGH_CHAMBER(7000), // 4000
         HIGH_BUCKET(10000); //5800

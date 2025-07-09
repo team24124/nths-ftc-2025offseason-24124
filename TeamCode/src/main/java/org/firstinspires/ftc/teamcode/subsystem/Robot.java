@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.utility.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.utility.telemetry.TelemetryMaster;
 
 public class Robot {
@@ -17,7 +18,7 @@ public class Robot {
     public ControlClaw controlClaw;
     public Extension extension;
     public Slides slides;
-    public RobotCentricDriveTrain driveTrain;
+    public DriveTrain driveTrain;
 
     public TelemetryMaster telemetryMaster;
 
@@ -32,7 +33,7 @@ public class Robot {
         slides = new Slides(hw);
 
         Pose2d startPose = new Pose2d(new Vector2d(0, 0), Math.toRadians(0));
-        driveTrain = new RobotCentricDriveTrain(hw, startPose);
+        driveTrain = new FieldCentricDriveTrain(hw, startPose);
 
         telemetryMaster = new TelemetryMaster(telemetry);
         telemetryMaster
@@ -124,7 +125,7 @@ public class Robot {
                 controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
                 controlClaw.setClawPosition(ControlClaw.ClawState.CLOSED),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.SCORE),
-                arm.moveTo(Arm.State.PASSTHROUGH),
+                arm.moveTo(Arm.State.SCORE),
                 slides.setStateTo(Slides.State.HIGH_RUNG)
         );
     }
