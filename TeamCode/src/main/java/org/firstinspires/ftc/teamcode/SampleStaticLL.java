@@ -8,6 +8,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.subsystem.Robot;
+import org.firstinspires.ftc.teamcode.utility.ActionScheduler;
+
 @TeleOp(name = "SampleStaticLL", group="Linear OpMode")
 public class SampleStaticLL extends LinearOpMode {
     DcMotor front_left_motor;
@@ -24,7 +27,7 @@ public class SampleStaticLL extends LinearOpMode {
     private Servo bottom_claw;
     private Servo top_pivot;
     private Servo top_claw;
-    double kP = 0.004; // Tune this proportional constant
+    double kP = 0.0026; // Tune this proportional constant
     @Override
     public void runOpMode() {
         left_extension = hardwareMap.get(Servo.class, "left_extension");
@@ -65,8 +68,22 @@ public class SampleStaticLL extends LinearOpMode {
         limelight.start();
         // Main loops
         while (opModeIsActive()) {
+            if (arm.getCurrentPosition() < 0) {
+                arm.setPower(0.1);
+            } else {
+                arm.setPower(0.1);
+            }
+            if (gamepad1.x) {
+                bottom_pivot.setPosition(bottom_pivot.getPosition() + 0.002);
+            }
+            if (gamepad1.y) {
+                bottom_pivot.setPosition(bottom_pivot.getPosition() - 0.002);
+            }
+            if (gamepad1.b) {
+                bottom_claw.setPosition(1);
+            }
             telemetry.addData("elbowpos", left_bottom_elbow.getPosition());
-            telemetry.update();
+            telemetry.addData("pivot", bottom_pivot.getPosition());
             if (limelight.isRunning()) {
                 if (limelight.getLatestResult() != null) {
 
@@ -79,89 +96,80 @@ public class SampleStaticLL extends LinearOpMode {
                             telemetry.addData("targetY", pythonOutputs[2]);
                             telemetry.addData("angle", pythonOutputs[3]);
                             telemetry.addData("area %", pythonOutputs[4]);
+                            telemetry.addData("pivot", bottom_pivot.getPosition());
                             telemetry.update();
                         }
                     }
 
 
                     if (gamepad1.a) {
-                        double[] array = limelight.getLatestResult().getPythonOutput();
-                        double targetX = array[1];
-                        double targetY = array[2];
-                        double angle = array[3];
-                        double strafeX = (targetX - 83) * kP;
-                        double strafeY = (targetY - 265) * kP;
-                        telemetry.update();
-
-                        while (targetX < 78 || targetX > 88 || targetY < 260 || targetY > 270) {
+                        if (limelight.getLatestResult() != null) {
+                            double[] array = limelight.getLatestResult().getPythonOutput();
+                            double targetX = array[1];
+                            double targetY = array[2];
+                            double angle = array[3];
+                            double strafeX = (targetX - 122) * kP; //righter = higher
+                            double strafeY = (targetY - 200) * kP; //closer = lower
                             telemetry.update();
 
-                            array = limelight.getLatestResult().getPythonOutput();
-                            targetX = array[1];
-                            targetY = array[2];
-                            angle = array[3];
-                            strafeX = (targetX - 83) * kP;
-                            strafeY = (targetY - 265) * kP;
+                            while (targetX < 118 || targetX > 126 || targetY < 196 || targetY > 204) {
+                                telemetry.update();
 
-                            if (array == null) {
-                                break;
-                            }
+                                array = limelight.getLatestResult().getPythonOutput();
+                                targetX = array[1];
+                                targetY = array[2];
+                                angle = array[3];
+                                strafeX = (targetX - 122) * kP;
+                                strafeY = (targetY - 200) * kP;
 
-                            double baseX = 0;
-                            double baseY = 0;
-                            if (strafeX < 0) {
-                                baseX = -0.052;
-                            } else if (strafeX > 0){
-                                baseX = 0.052;
-                            }
-                            if (strafeY < 0) {
-                                baseY = -0.052;
-                            } else if (strafeY > 0){
-                                baseY = 0.052;
-                            }
-
-                            // Calculate the power for each wheel
-                            double frontLeftPower = strafeY - strafeX - baseX + baseY;
-                            double frontRightPower = strafeY + strafeX + baseX + baseY;
-                            double backLeftPower = strafeY + strafeX + baseX + baseY;
-                            double backRightPower = strafeY - strafeX - baseX + baseY;
-                            // Set the motor powers
-                            front_left_motor.setPower(frontLeftPower);
-                            front_right_motor.setPower(frontRightPower);
-                            back_left_motor.setPower(backLeftPower);
-                            back_right_motor.setPower(backRightPower);
-
-
-                            if (targetX > 78 && targetX < 88 && targetY > 260 && targetY < 270) {
-                                front_left_motor.setPower(0);
-                                front_right_motor.setPower(0);
-                                back_left_motor.setPower(0);
-                                back_right_motor.setPower(0);
-                                left_extension.setPosition(0.662);
-                                right_extension.setPosition(0.662);
-                                if (angle < 0) {
-                                    angle = -angle;
+                                if (array == null) {
+                                    break;
                                 }
-                                //right tilt is 90 to 180
-                                //left tilt is 0 to 90
-                                bottom_pivot.setPosition(((double) 1 /180) * angle);  //if ll is attached static
 
-                                while (true) {
-                                    left_bottom_elbow.setPosition(0.14);
-                                    right_bottom_elbow.setPosition(0.14);
-                                    bottom_claw.setPosition(0.6);
-                                    if (left_bottom_elbow.getPosition() < 0.16) {
-                                        bottom_claw.setPosition(0.85);
-                                        sleep(50);
-                                        left_bottom_elbow.setPosition(0.83);
-                                        right_bottom_elbow.setPosition(0.83);
-                                        bottom_pivot.setPosition(0.14);
-                                        left_extension.setPosition(0.5);
-                                        right_extension.setPosition(0.5);
-                                        break;
-                                    }
+                                double baseX = 0;
+                                double baseY = 0;
+                                if (strafeX < 0) baseX = -0.095;
+                                else if (strafeX > 0) baseX = 0.095;
+
+                                if (strafeY < 0) baseY = -0.095;
+                                else if (strafeY > 0) baseY = 0.095;
+
+                                // Calculate the power for each wheel
+                                double frontLeftPower = strafeY - strafeX - baseX + baseY;
+                                double frontRightPower = strafeY + strafeX + baseX + baseY;
+                                double backLeftPower = strafeY + strafeX + baseX + baseY;
+                                double backRightPower = strafeY - strafeX - baseX + baseY;
+                                // Set the motor powers
+                                front_left_motor.setPower(frontLeftPower);
+                                front_right_motor.setPower(frontRightPower);
+                                back_left_motor.setPower(backLeftPower);
+                                back_right_motor.setPower(backRightPower);
+                                if (gamepad1.right_bumper) {
+                                    break;
                                 }
-                                top_pivot.setPosition(1);
+
+
+                                if (targetX > 118 && targetX < 122 && targetY > 196 && targetY < 204) {
+                                    front_left_motor.setPower(0);
+                                    front_right_motor.setPower(0);
+                                    back_left_motor.setPower(0);
+                                    back_right_motor.setPower(0);
+                                    left_extension.setPosition(0.8);
+                                    right_extension.setPosition(0.8);
+                                    left_bottom_elbow.setPosition(0.88);
+                                    if (angle < 0) angle = -angle;
+                                    //right tilt is 90 to 180
+                                    //left tilt is 0 to 90
+                                    bottom_pivot.setPosition(   0.82 - (((double) 0.67/180) * angle)  );  //if ll is attached static
+                                    //bottom pivot increments are 0.15 0.5 0.82 from left to right  | _ |
+                                    sleep(1500);
+                                    bottom_claw.setPosition(0.8);
+                                    sleep(250);
+                                    left_bottom_elbow.setPosition(0);
+                                    left_extension.setPosition(0.5);
+                                    right_extension.setPosition(0.5);
+                                    break;
+                                }
                             }
                         }
                         front_left_motor.setPower(0);
