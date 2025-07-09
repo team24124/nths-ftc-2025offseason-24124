@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -19,7 +20,7 @@ public class SpecimenAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         robot = new Robot(hardwareMap, telemetry);
 
-        Pose2d initialPose = new Pose2d(-12, 62, Math.toRadians(270));
+        Pose2d initialPose = new Pose2d(-8, 62, Math.toRadians(90));
         robot.driveTrain.getDrive().localizer.setPose(initialPose);
         waitForStart();
 
@@ -28,8 +29,16 @@ public class SpecimenAuto extends LinearOpMode {
         // Drive forwards 10 inches, extend collection, pass block through
         Actions.runBlocking(
                 robot.driveTrain.getDrive().actionBuilder(initialPose)
-                        .splineTo(new Vector2d(-12, 31.5), 0)
-                        .afterTime(1, robot.slides.moveTo(Slides.State.HIGH_RUNG.position))
+                        .splineToConstantHeading(new Vector2d(5, -32), 90)
+                        .stopAndAdd(new InstantAction(()->{})) // Score preloaded specimen
+                        .strafeTo(new Vector2d(5, -40))
+
+                        .splineToConstantHeading(new Vector2d(48, -40), 90)
+                        .stopAndAdd(new InstantAction(()->{})) // Grab first specimen
+                        .splineToConstantHeading(new Vector2d(48, -60), 90)
+                        .stopAndAdd(new InstantAction(()->{})) // Deposit and grab from observation zone
+                        .splineToConstantHeading(new Vector2d(7, -32), 90)
+                        .stopAndAdd(new InstantAction(()->{})) // Score first specimen
                         .build()
         );
     }
