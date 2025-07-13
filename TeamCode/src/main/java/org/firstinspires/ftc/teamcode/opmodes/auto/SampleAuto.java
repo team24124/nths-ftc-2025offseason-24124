@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystem.Robot;
 public class SampleAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        Pose2d beginPose = new Pose2d(-8, 62, 90);
+        Pose2d beginPose = new Pose2d(8, -62, 90);
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 

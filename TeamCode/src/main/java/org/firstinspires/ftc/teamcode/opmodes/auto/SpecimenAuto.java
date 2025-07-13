@@ -20,7 +20,7 @@ public class SpecimenAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         robot = new Robot(hardwareMap, telemetry);
 
-        Pose2d initialPose = new Pose2d(-8, 62, Math.toRadians(90));
+        Pose2d initialPose = new Pose2d(8, -62, Math.toRadians(90));
         robot.driveTrain.getDrive().localizer.setPose(initialPose);
         waitForStart();
 
@@ -30,15 +30,17 @@ public class SpecimenAuto extends LinearOpMode {
         Actions.runBlocking(
                 robot.driveTrain.getDrive().actionBuilder(initialPose)
                         .splineToConstantHeading(new Vector2d(5, -32), 90)
-                        .stopAndAdd(new InstantAction(()->{})) // Score preloaded specimen
+                        .stopAndAdd(robot.moveToScore()) // Score preloaded specimen
                         .strafeTo(new Vector2d(5, -40))
+                        .stopAndAdd(robot.collectFromWall())
 
                         .splineToConstantHeading(new Vector2d(48, -40), 90)
-                        .stopAndAdd(new InstantAction(()->{})) // Grab first specimen
+                        .stopAndAdd(robot.extendCollection()) // Grab first specimen
+                        .stopAndAdd(robot.passthrough())
                         .splineToConstantHeading(new Vector2d(48, -60), 90)
-                        .stopAndAdd(new InstantAction(()->{})) // Deposit and grab from observation zone
+                        .stopAndAdd(robot.moveToScore()) // Deposit and grab from observation zone
                         .splineToConstantHeading(new Vector2d(7, -32), 90)
-                        .stopAndAdd(new InstantAction(()->{})) // Score first specimen
+                        .stopAndAdd(robot.collectFromWall()) // Score first specimen
                         .build()
         );
     }
