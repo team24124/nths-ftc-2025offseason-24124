@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.utility.selections.ArraySelect;
 import org.firstinspires.ftc.teamcode.utility.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.utility.telemetry.TelemetryObservable;
 
@@ -44,12 +45,12 @@ public class RobotCentricDriveTrain extends DriveTrain implements TelemetryObser
             rightBackPower /= power + Math.abs(turn);
         }
 
-        //ArraySelect<Double> speeds = getSpeeds();
+        ArraySelect<Double> speeds = getSpeeds();
         super.setDrivePowers(
-                leftPower,
-                rightPower,
-                leftBackPower,
-                rightBackPower
+                leftPower * speeds.getSelected(),
+                rightPower * speeds.getSelected(),
+                leftBackPower * speeds.getSelected(),
+                rightBackPower * speeds.getSelected()
         );
     }
 

@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 //import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 //import org.firstinspires.ftc.teamcode.roadrunner.PinpointDrive;
 import org.firstinspires.ftc.teamcode.subsystem.RobotCentricDriveTrain;
+import org.firstinspires.ftc.teamcode.utility.selections.ArraySelect;
 import org.firstinspires.ftc.teamcode.utility.telemetry.TelemetryObservable;
 
 /**
@@ -22,16 +23,11 @@ public abstract class DriveTrain implements Subsystem, TelemetryObservable {
     public String getName() { return "Drive Train"; }
 
     private final MecanumDrive drive;
-    private double heading;
+    private final ArraySelect<Double> speeds;
 
     public DriveTrain(HardwareMap hw, Pose2d start) {
         drive = new MecanumDrive(hw, start);
-        heading = start.heading.toDouble();
-    }
-
-    @Override
-    public void periodic(){
-        //heading = drive;
+        speeds = new ArraySelect<Double>(new Double[]{0.5, 1.0});
     }
 
     /**
@@ -46,6 +42,7 @@ public abstract class DriveTrain implements Subsystem, TelemetryObservable {
     public MecanumDrive getDrive(){
         return drive;
     }
+    public ArraySelect<Double> getSpeeds() { return speeds; }
 
     public double getHeading() {
         return drive.localizer.getPose().heading.toDouble();

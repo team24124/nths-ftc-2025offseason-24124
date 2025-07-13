@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.utility.selections.ArraySelect;
 import org.firstinspires.ftc.teamcode.utility.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.utility.telemetry.TelemetryObservable;
 
@@ -15,18 +16,8 @@ import org.firstinspires.ftc.teamcode.utility.telemetry.TelemetryObservable;
  */
 public class FieldCentricDriveTrain extends DriveTrain implements TelemetryObservable {
 
-    // Retrieve the IMU from the hardware map
-    private IMU imu;
-    // Adjust the orientation parameters to match your robot
-
     public FieldCentricDriveTrain(HardwareMap hw, Pose2d start) {
         super(hw, start);
-//        imu = hw.get(IMU.class, "imu");
-//        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-//                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-//                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
-//        // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
-//        imu.initialize(parameters);
     }
 
     /**
@@ -54,12 +45,12 @@ public class FieldCentricDriveTrain extends DriveTrain implements TelemetryObser
         double frontRightPower = (rotY - rotX - rx) / denominator;
         double backRightPower = (rotY + rotX - rx) / denominator;
 
-        //ArraySelect<Double> speeds = getSpeeds();
+        ArraySelect<Double> speeds = getSpeeds();
         super.setDrivePowers(
-                frontLeftPower,
-                frontRightPower,
-                backLeftPower,
-                backRightPower
+                frontLeftPower * speeds.getSelected(),
+                frontRightPower * speeds.getSelected(),
+                backLeftPower * speeds.getSelected(),
+                backRightPower * speeds.getSelected()
         );
     }
 

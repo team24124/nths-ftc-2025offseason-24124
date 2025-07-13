@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys.Button;
@@ -10,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
+import org.firstinspires.ftc.teamcode.subsystem.Slides;
 import org.firstinspires.ftc.teamcode.utility.ActionScheduler;
 
 @TeleOp(name = "Main", group = "!")
@@ -34,7 +37,18 @@ public class Main extends OpMode {
         double x = gamepad1.left_stick_x;
         double rx = gamepad1.right_stick_x;
 
-        if(driver.wasJustPressed(Button.A)) {
+        // Change speeds of drive train
+        if(driver.wasJustPressed(Button.LEFT_BUMPER)) { actions.schedule(new InstantAction(robot.driveTrain.getSpeeds()::previous)); }
+        if(driver.wasJustPressed(Button.RIGHT_BUMPER)) { actions.schedule(new InstantAction(robot.driveTrain.getSpeeds()::next)); }
+
+        // Reset the orientation for the the field-centric drive
+        if(driver.wasJustPressed(Button.START)) {
+            Vector2d current = robot.driveTrain.getDrive().localizer.getPose().position;
+            robot.driveTrain.getDrive().localizer.setPose(new Pose2d(current, 0));
+        }
+
+        // Toggle between extending and completely the rest of the passthrough
+        if(operator.wasJustPressed(Button.A)) {
             if(!robot.isExtended()){
                 actions.schedule(robot.extendCollection());
             }else{
@@ -42,37 +56,40 @@ public class Main extends OpMode {
             }
         }
 
-        if(driver.wasJustPressed(Button.START)) {
-            Vector2d current = robot.driveTrain.getDrive().localizer.getPose().position;
-            robot.driveTrain.getDrive().localizer.setPose(new Pose2d(current, 0));
-        }
-
-        if(driver.wasJustPressed(Button.X)){
+        // Toggle the top claw between scoring and collecting
+        if(operator.wasJustPressed(Button.X)){
             if(robot.isInScoringMode()){
-                actions.schedule(robot.collectFromWall());
+                actions.schedule(robot.scoreSpecimen());
             }else {
                 actions.schedule(robot.moveToScore());
             }
         }
 
-        if (driver.wasJustPressed(Button.Y)) {
-            actions.schedule(robot.controlClaw.toggleClaw());
-        }
+        // Open/Close Top Claw
+        if (driver.wasJustReleased(Button.Y)) { actions.schedule(robot.controlClaw.toggleClaw()); }
 
-        if(driver.wasJustPressed(Button.BACK)) { actions.schedule(robot.resetControlArm()); }
+        // Reset Top Arm to starting positions
+        if(operator.wasJustPressed(Button.BACK)) { actions.schedule(robot.resetControlArm()); }
 
         // Control Viper Slides
-        if(driver.wasJustPressed(Button.DPAD_UP)) { actions.schedule(robot.slides.nextPos()); }
-        if(driver.wasJustPressed(Button.DPAD_DOWN)) { actions.schedule(robot.slides.prevPos()); }
+        if(operator.wasJustPressed(Button.DPAD_UP)) { actions.schedule(robot.slides.nextPos()); }
+        if(operator.wasJustPressed(Button.DPAD_DOWN)) { actions.schedule(robot.slides.prevPos()); }
+
+        if(operator.wasJustPressed(Button.DPAD_LEFT)) { 
+            actions.schedule(new SequentialAction(
+                    robot.slides.setStateTo(Slides.State.HOME),
+                    robot.collectFromWall()
+            ));
+        }
 
         // Collection Claw Pivots
-        if(driver.wasJustPressed(Button.LEFT_BUMPER)) { actions.schedule(robot.collectionClaw.prevPivot()); }
-        if(driver.wasJustPressed(Button.RIGHT_BUMPER)) { actions.schedule(robot.collectionClaw.nextPivot()); }
+        if(operator.wasJustPressed(Button.LEFT_BUMPER)) { actions.schedule(robot.collectionClaw.prevPivot()); }
+        if(operator.wasJustPressed(Button.RIGHT_BUMPER)) { actions.schedule(robot.collectionClaw.nextPivot()); }
 
         // Move the arm back and forth using triggers
-        if(driver.getTrigger(Trigger.RIGHT_TRIGGER) > 0 || driver.getTrigger(Trigger.LEFT_TRIGGER) > 0){
-            double rightTrigger = driver.getTrigger(Trigger.RIGHT_TRIGGER);
-            double leftTrigger = driver.getTrigger(Trigger.LEFT_TRIGGER);
+        if(operator.getTrigger(Trigger.RIGHT_TRIGGER) > 0 || operator.getTrigger(Trigger.LEFT_TRIGGER) > 0){
+            double rightTrigger = operator.getTrigger(Trigger.RIGHT_TRIGGER);
+            double leftTrigger = operator.getTrigger(Trigger.LEFT_TRIGGER);
             int fudgedArmPosition = (int)(robot.arm.getFudgeFactor() * (rightTrigger + -leftTrigger));
             actions.schedule(
                     robot.arm.moveTo((robot.arm.getCurrentState().position - fudgedArmPosition))
@@ -80,14 +97,15 @@ public class Main extends OpMode {
         }
 
 
-
         robot.driveTrain.drive(x, y, rx);
         robot.telemetryMaster.update(); // Update telemetry
+
         driver.readButtons();
         operator.readButtons();
+
         robot.slides.periodic();
         robot.driveTrain.periodic();
-        telemetry.addData("IsExtended", robot.isExtended());
+
         ActionScheduler.INSTANCE.run(); // Call this in order for actions to work
     }
 

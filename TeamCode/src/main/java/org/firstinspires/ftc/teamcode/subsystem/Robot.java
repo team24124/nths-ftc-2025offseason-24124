@@ -130,6 +130,18 @@ public class Robot {
         );
     }
 
+    public Action scoreSpecimen(){
+        isInScoringMode = false;
+        return new SequentialAction(
+                controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
+                slides.moveTo(Slides.State.CLIP_HIGH_CHAMBER.position),
+                arm.moveTo(Arm.State.ACTIVE),
+                controlClaw.setElbowPosition(ControlClaw.ElbowState.ACTIVE),
+                new SleepAction(1),
+                controlClaw.setClawPosition(ControlClaw.ClawState.OPEN)
+        );
+    }
+
     public Action resetControlArm(){
         return new SequentialAction(
                 arm.moveTo(Arm.State.HOME),
