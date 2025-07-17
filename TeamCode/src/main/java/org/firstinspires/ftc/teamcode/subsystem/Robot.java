@@ -56,13 +56,13 @@ public class Robot {
     public Action extendCollection(){
         isExtended = true;
         return new SequentialAction(
-                collectionClaw.setPivotPosition(CollectionClaw.PivotState.ONEEIGHTY),
                 collectionClaw.setClawPosition(CollectionClaw.ClawState.OPEN),
                 new ParallelAction(
                         extension.extendTo(Extension.State.EXTENDED.position),
                         collectionClaw.setElbowPosition(CollectionClaw.ElbowState.ACTIVE)
 
-                )
+                ),
+                collectionClaw.setPivotPosition(CollectionClaw.PivotState.ONEEIGHTY)
         );
     }
 
@@ -79,10 +79,37 @@ public class Robot {
         );
     }
 
+    public Action retractCollectionNoRotate(){
+        isExtended = false;
+        return new SequentialAction(
+                collectionClaw.setClawPosition(CollectionClaw.ClawState.CLOSED),
+                new SleepAction(0.1),
+                new ParallelAction(
+                        extension.extendTo(Extension.State.RETRACTED.position),
+                        collectionClaw.setElbowPosition(CollectionClaw.ElbowState.PASSTHROUGH),
+                        collectionClaw.setPivotPosition(CollectionClaw.PivotState.ONEEIGHTY)
+                )
+        );
+    }
+
     public Action collectFromPassthrough(){
         isInScoringMode = false;
         return new SequentialAction(
                 controlClaw.setPivotPosition(ControlClaw.PivotState.TWOSEVENTY),
+                controlClaw.setClawPosition(ControlClaw.ClawState.OPEN),
+                slides.moveTo(Slides.State.PASSTHROUGH.position),
+                arm.moveTo(Arm.State.PASSTHROUGH),
+                controlClaw.setElbowPosition(ControlClaw.ElbowState.PASSTHROUGH),
+                new SleepAction(0.3),
+                controlClaw.setClawPosition(ControlClaw.ClawState.CLOSED)
+
+        );
+    }
+
+    public Action collectFromPassthroughNoRotate(){
+        isInScoringMode = false;
+        return new SequentialAction(
+                controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
                 controlClaw.setClawPosition(ControlClaw.ClawState.OPEN),
                 slides.moveTo(Slides.State.PASSTHROUGH.position),
                 arm.moveTo(Arm.State.PASSTHROUGH),
@@ -114,6 +141,20 @@ public class Robot {
                 ),
                 new SleepAction(0.8),
                 collectFromPassthrough(),
+                new SleepAction(0.4),
+                collectFromWall()
+        );
+    }
+    public Action passthroughNoRotate(){
+        return new SequentialAction(
+                new ParallelAction(
+                        retractCollectionNoRotate(),
+                        resetControlArm()
+                ),
+                controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
+                slides.moveTo(Slides.State.PASSTHROUGH.position+500),
+                new SleepAction(0.8),
+                collectFromPassthroughNoRotate(),
                 new SleepAction(0.4),
                 collectFromWall()
         );

@@ -46,7 +46,7 @@ public class ControlClaw implements Subsystem, TelemetryObservable {
 
     public enum ElbowState {
         PASSTHROUGH(0.12),
-        SCORE(0.5),
+        SCORE(0.6),
         ACTIVE(0.8);
 
         public final double position;
@@ -75,7 +75,7 @@ public class ControlClaw implements Subsystem, TelemetryObservable {
         rightElbow.setDirection(Servo.Direction.FORWARD);
 
         setElbowPositions(ElbowState.PASSTHROUGH.position);
-        claw.setPosition(ClawState.OPEN.position);
+        claw.setPosition(ClawState.CLOSED.position);
         pivot.setPosition(PivotState.ONEEIGHTY.position);
         pivotStates.setSelected(5); // Set the selected pivot state to the one at the fifth index
     }

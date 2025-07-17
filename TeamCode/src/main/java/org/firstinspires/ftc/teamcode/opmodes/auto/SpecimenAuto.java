@@ -30,17 +30,19 @@ public class SpecimenAuto extends LinearOpMode {
         // Drive forwards 10 inches, extend collection, pass block through
         Actions.runBlocking(
                 robot.driveTrain.getDrive().actionBuilder(initialPose)
-                        .splineToConstantHeading(new Vector2d(5, -32), 90)
-                        .stopAndAdd(robot.moveToScore()) // Score preloaded specimen
-                        .waitSeconds(0.2)
+                        .afterTime(0.15, robot.moveToScore()) // Score preloaded specimen
+                        .splineToConstantHeading(new Vector2d(-6, -30), 90)
                         .stopAndAdd(robot.scoreSpecimen())
-                        .strafeTo(new Vector2d(5, -40))
+                        .splineToConstantHeading(new Vector2d(-6, -36), 270)
+                        .splineToConstantHeading(new Vector2d(42, -49), 0)
                         .stopAndAdd(robot.collectFromWall())
-
-                        .splineToConstantHeading(new Vector2d(48, -40), 90)
+                        .waitSeconds(0.1)
                         .stopAndAdd(robot.extendCollection()) // Grab first specimen
-//                        .stopAndAdd(robot.passthrough())
-////                        .splineToConstantHeading(new Vector2d(48, -60), 90)
+                        .waitSeconds(2)
+                        .stopAndAdd(robot.passthroughNoRotate())
+                        .waitSeconds(2)
+                        .stopAndAdd(robot.controlClaw.setClawPosition(ControlClaw.ClawState.OPEN))
+                        .splineToConstantHeading(new Vector2d(42, -49), 90)
 ////                        .stopAndAdd(robot.moveToScore()) // Deposit and grab from observation zone
 ////                        .splineToConstantHeading(new Vector2d(7, -32), 90)
 ////                        .stopAndAdd(robot.collectFromWall()) // Score first specimen
