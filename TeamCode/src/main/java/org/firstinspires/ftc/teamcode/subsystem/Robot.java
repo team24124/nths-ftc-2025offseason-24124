@@ -97,7 +97,7 @@ public class Robot {
         return new SequentialAction(
                 controlClaw.setPivotPosition(ControlClaw.PivotState.TWOSEVENTY),
                 controlClaw.setClawPosition(ControlClaw.ClawState.OPEN),
-                slides.moveTo(Slides.State.PASSTHROUGH.position),
+                slides.setStateTo(Slides.State.PASSTHROUGH),
                 arm.moveTo(Arm.State.PASSTHROUGH),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.PASSTHROUGH),
                 new SleepAction(0.3),
@@ -111,7 +111,7 @@ public class Robot {
         return new SequentialAction(
                 controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
                 controlClaw.setClawPosition(ControlClaw.ClawState.OPEN),
-                slides.moveTo(Slides.State.PASSTHROUGH.position),
+                slides.setStateTo(Slides.State.PASSTHROUGH),
                 arm.moveTo(Arm.State.PASSTHROUGH),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.PASSTHROUGH),
                 new SleepAction(0.3),
@@ -167,7 +167,7 @@ public class Robot {
                 controlClaw.setClawPosition(ControlClaw.ClawState.CLOSED),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.SCORE),
                 arm.moveTo(Arm.State.SCORE),
-                slides.moveTo(Slides.State.HIGH_RUNG.position)
+                slides.setStateTo(Slides.State.HIGH_RUNG)
         );
     }
 
@@ -175,7 +175,7 @@ public class Robot {
         isInScoringMode = false;
         return new SequentialAction(
                 controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
-                slides.moveTo(Slides.State.CLIP_HIGH_CHAMBER.position),
+                slides.setStateTo(Slides.State.CLIP_HIGH_CHAMBER),
                 arm.moveTo(Arm.State.ACTIVE),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.ACTIVE),
                 new SleepAction(1),
@@ -186,7 +186,7 @@ public class Robot {
     public Action resetControlArm(){
         return new SequentialAction(
                 arm.moveTo(Arm.State.HOME),
-                slides.moveTo(Slides.State.PASSTHROUGH.position),
+                slides.setStateTo(Slides.State.PASSTHROUGH),
                 controlClaw.setClawPosition(ControlClaw.ClawState.OPEN),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.PASSTHROUGH),
                 controlClaw.setPivotPosition(ControlClaw.PivotState.TWOSEVENTY)

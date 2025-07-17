@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -71,28 +73,11 @@ public class Slides implements Subsystem, TelemetryObservable {
         controller = new PIDController(coefficients.p, coefficients.i, coefficients.d);
     }
 
-    @Override
-    public void periodic() {
-        target = positions.getSelected().position;
-        double p = coefficients.p;
-        double i = coefficients.i;
-        double d = coefficients.d;
-        double f = coefficients.f;
-
-        controller.setPID(p, i, d);
-        int armPos = leftSlide.getCurrentPosition();
-        double pid = controller.calculate(armPos, target);
-        double power = (pid + f) * (12.0 / voltageSensor.getVoltage()); // Compensate for voltage discrepencies
-
-        leftSlide.setPower(power);
-        rightSlide.setPower(power);
-    }
-
     public Action setStateTo(State state){
-        return (TelemetryPacket packet) -> {
-            positions.setSelected(state);
-            return false;
-        };
+        return new SequentialAction(
+                new InstantAction(() -> {positions.setSelected(state);}),
+                moveTo(state.position)
+        );
     }
 
     public Action nextPos(){
@@ -103,10 +88,10 @@ public class Slides implements Subsystem, TelemetryObservable {
     }
 
     public Action prevPos(){
-        return (TelemetryPacket packet) -> {
-            positions.previous();
-            return false;
-        };
+        return new SequentialAction(
+                new InstantAction(positions::next),
+                moveTo(positions.getSelected().position)
+        );
     }
 
     /**

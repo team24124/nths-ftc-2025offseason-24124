@@ -72,8 +72,16 @@ public class Main extends OpMode {
         if(operator.wasJustPressed(Button.BACK)) { actions.schedule(robot.resetControlArm()); }
 
         // Control Viper Slides
-        if(operator.wasJustPressed(Button.DPAD_UP)) { actions.schedule(robot.slides.nextPos()); }
-        if(operator.wasJustPressed(Button.DPAD_DOWN)) { actions.schedule(robot.slides.prevPos()); }
+        if(operator.wasJustPressed(Button.DPAD_UP)) { actions.schedule(
+                new SequentialAction(
+                        robot.slides.nextPos()
+                ));
+        }
+        if(operator.wasJustPressed(Button.DPAD_DOWN)) {
+            actions.schedule(new SequentialAction(
+                    robot.slides.prevPos()
+            ));
+        }
 
         if(operator.wasJustPressed(Button.DPAD_LEFT)) { 
             actions.schedule(new SequentialAction(
