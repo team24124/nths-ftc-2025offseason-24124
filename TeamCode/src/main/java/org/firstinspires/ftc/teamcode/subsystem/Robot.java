@@ -45,15 +45,15 @@ public class Robot {
                 .subscribe(driveTrain);
     }
 
-    public boolean isExtended(){
+    public boolean isExtended() {
         return isExtended;
     }
 
-    public boolean isInScoringMode(){
+    public boolean isInScoringMode() {
         return isInScoringMode;
     }
 
-    public Action extendCollection(){
+    public Action extendCollection() {
         isExtended = true;
         return new SequentialAction(
                 collectionClaw.setClawPosition(CollectionClaw.ClawState.OPEN),
@@ -66,7 +66,7 @@ public class Robot {
         );
     }
 
-    public Action retractCollection(){
+    public Action retractCollection() {
         isExtended = false;
         return new SequentialAction(
                 collectionClaw.setClawPosition(CollectionClaw.ClawState.CLOSED),
@@ -79,7 +79,7 @@ public class Robot {
         );
     }
 
-    public Action retractCollectionNoRotate(){
+    public Action retractCollectionNoRotate() {
         isExtended = false;
         return new SequentialAction(
                 collectionClaw.setClawPosition(CollectionClaw.ClawState.CLOSED),
@@ -92,7 +92,7 @@ public class Robot {
         );
     }
 
-    public Action collectFromPassthrough(){
+    public Action collectFromPassthrough() {
         isInScoringMode = false;
         return new SequentialAction(
                 controlClaw.setPivotPosition(ControlClaw.PivotState.TWOSEVENTY),
@@ -106,7 +106,7 @@ public class Robot {
         );
     }
 
-    public Action collectFromPassthroughNoRotate(){
+    public Action collectFromPassthroughNoRotate() {
         isInScoringMode = false;
         return new SequentialAction(
                 controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
@@ -120,20 +120,17 @@ public class Robot {
         );
     }
 
-    public Action collectFromWall(){
+    public Action collectFromWall() {
         isInScoringMode = false;
-        return new SequentialAction(
-                collectionClaw.setClawPosition(CollectionClaw.ClawState.OPEN),
-                new SleepAction(0.2),
-                controlClaw.setElbowPosition(ControlClaw.ElbowState.ACTIVE),
+        return new ParallelAction(new SequentialAction(
                 arm.moveTo(Arm.State.ACTIVE),
-                new SleepAction(0.1),
-                controlClaw.setClawPosition(ControlClaw.ClawState.CLOSED),
-                controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY)
-        );
+                controlClaw.setElbowPosition(ControlClaw.ElbowState.ACTIVE),
+                controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
+                collectionClaw.setClawPosition(CollectionClaw.ClawState.OPEN)
+        ), slides.setStateTo(Slides.State.CLIPPER));
     }
 
-    public Action passthrough(){
+    public Action passthrough() {
         return new SequentialAction(
                 new ParallelAction(
                         retractCollection(),
@@ -145,14 +142,15 @@ public class Robot {
                 collectFromWall()
         );
     }
-    public Action passthroughNoRotate(){
+
+    public Action passthroughNoRotate() {
         return new SequentialAction(
                 new ParallelAction(
                         retractCollectionNoRotate(),
                         resetControlArm()
                 ),
                 controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
-                slides.moveTo(Slides.State.PASSTHROUGH.position+500),
+                slides.moveTo(Slides.State.PASSTHROUGH.position + 500),
                 new SleepAction(0.8),
                 collectFromPassthroughNoRotate(),
                 new SleepAction(0.4),
@@ -160,7 +158,7 @@ public class Robot {
         );
     }
 
-    public Action moveToScore(){
+    public Action moveToScore() {
         isInScoringMode = true;
         return new SequentialAction(
                 controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
@@ -171,7 +169,7 @@ public class Robot {
         );
     }
 
-    public Action scoreSpecimen(){
+    public Action scoreSpecimen() {
         isInScoringMode = false;
         return new SequentialAction(
                 controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
@@ -183,7 +181,7 @@ public class Robot {
         );
     }
 
-    public Action resetControlArm(){
+    public Action resetControlArm() {
         return new SequentialAction(
                 arm.moveTo(Arm.State.HOME),
                 slides.setStateTo(Slides.State.PASSTHROUGH),

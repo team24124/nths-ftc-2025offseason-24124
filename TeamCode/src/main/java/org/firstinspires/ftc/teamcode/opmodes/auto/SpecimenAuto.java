@@ -50,9 +50,8 @@ public class SpecimenAuto extends LinearOpMode {
                         .stopAndAdd(robot.passthroughNoRotate())
                         .stopAndAdd(robot.controlClaw.setClawPosition(ControlClaw.ClawState.OPEN))
                         .strafeToConstantHeading(new Vector2d(50, -52))
-                        .stopAndAdd(robot.slides.setStateTo(Slides.State.CLIPPER))
                         .stopAndAdd(robot.collectFromWall())
-                        .waitSeconds(3)
+                        .waitSeconds(1)
                         .stopAndAdd(robot.moveToScore())
 
 ////                        .stopAndAdd(robot.moveToScore()) // Deposit and grab from observation zone
