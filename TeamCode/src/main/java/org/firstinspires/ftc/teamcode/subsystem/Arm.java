@@ -17,8 +17,8 @@ public class Arm implements Subsystem, TelemetryObservable {
     public enum State {
         HOME(0),
         PASSTHROUGH(170),
-        SCORE(250),
-        ACTIVE(-180);
+        SCORE(300),
+        ACTIVE(-400);
 
         public final int position;
 

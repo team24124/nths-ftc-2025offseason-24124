@@ -66,21 +66,17 @@ public class Main extends OpMode {
         }
 
         // Open/Close Top Claw
-        if (driver.wasJustReleased(Button.Y)) { actions.schedule(robot.controlClaw.toggleClaw()); }
+        if (driver.wasJustPressed(Button.Y)) { actions.schedule(robot.controlClaw.toggleClaw()); }
 
         // Reset Top Arm to starting positions
         if(operator.wasJustPressed(Button.BACK)) { actions.schedule(robot.resetControlArm()); }
 
         // Control Viper Slides
-        if(operator.wasJustPressed(Button.DPAD_UP)) { actions.schedule(
-                new SequentialAction(
-                        robot.slides.nextPos()
-                ));
+        if(operator.wasJustPressed(Button.DPAD_UP)) {
+            actions.schedule(robot.slides.nextPos());
         }
         if(operator.wasJustPressed(Button.DPAD_DOWN)) {
-            actions.schedule(new SequentialAction(
-                    robot.slides.prevPos()
-            ));
+            actions.schedule(robot.slides.prevPos());
         }
 
         if(operator.wasJustPressed(Button.DPAD_LEFT)) { 

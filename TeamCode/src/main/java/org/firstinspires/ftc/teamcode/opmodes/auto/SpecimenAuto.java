@@ -30,19 +30,31 @@ public class SpecimenAuto extends LinearOpMode {
         // Drive forwards 10 inches, extend collection, pass block through
         Actions.runBlocking(
                 robot.driveTrain.getDrive().actionBuilder(initialPose)
-                        .afterTime(0.15, robot.moveToScore()) // Score preloaded specimen
-                        .splineToConstantHeading(new Vector2d(-6, -30), 90)
+                        .afterTime(0, robot.controlClaw.setElbowPosition(ControlClaw.ElbowState.SCORE))
+                        .afterTime(0.45, robot.moveToScore()) // Score preloaded specimen
+                        .splineToConstantHeading(new Vector2d(-5, -30), 90)
                         .stopAndAdd(robot.scoreSpecimen())
-                        .splineToConstantHeading(new Vector2d(-6, -36), 270)
-                        .splineToConstantHeading(new Vector2d(42, -49), 0)
+                        .splineToConstantHeading(new Vector2d(-5, -36), 270)
+                        .splineToLinearHeading(new Pose2d(new Vector2d(42, -49), Math.toRadians(93)), 0)
                         .stopAndAdd(robot.collectFromWall())
                         .waitSeconds(0.1)
                         .stopAndAdd(robot.extendCollection()) // Grab first specimen
-                        .waitSeconds(2)
+                        .waitSeconds(1)
                         .stopAndAdd(robot.passthroughNoRotate())
-                        .waitSeconds(2)
+                        .strafeTo(new Vector2d(50, -47))
                         .stopAndAdd(robot.controlClaw.setClawPosition(ControlClaw.ClawState.OPEN))
-                        .splineToConstantHeading(new Vector2d(42, -49), 90)
+                        .stopAndAdd(robot.collectFromWall())
+                        .waitSeconds(0.1)
+                        .stopAndAdd(robot.extendCollection()) // Grab first specimen
+                        .waitSeconds(1)
+                        .stopAndAdd(robot.passthroughNoRotate())
+                        .stopAndAdd(robot.controlClaw.setClawPosition(ControlClaw.ClawState.OPEN))
+                        .strafeToConstantHeading(new Vector2d(50, -52))
+                        .stopAndAdd(robot.slides.setStateTo(Slides.State.CLIPPER))
+                        .stopAndAdd(robot.collectFromWall())
+                        .waitSeconds(3)
+                        .stopAndAdd(robot.moveToScore())
+
 ////                        .stopAndAdd(robot.moveToScore()) // Deposit and grab from observation zone
 ////                        .splineToConstantHeading(new Vector2d(7, -32), 90)
 ////                        .stopAndAdd(robot.collectFromWall()) // Score first specimen

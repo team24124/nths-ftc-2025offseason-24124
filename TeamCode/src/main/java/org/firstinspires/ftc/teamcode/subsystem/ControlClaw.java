@@ -16,7 +16,7 @@ public class ControlClaw implements Subsystem, TelemetryObservable {
 
     public enum ClawState { // Accepts values between 0.5 and 1.0
         CLOSED(0.3),
-        OPEN(0.6);
+        OPEN(0.69);
 
         public final double position;
 
@@ -47,7 +47,8 @@ public class ControlClaw implements Subsystem, TelemetryObservable {
     public enum ElbowState {
         PASSTHROUGH(0.12),
         SCORE(0.6),
-        ACTIVE(0.8);
+        CLIP(0.7),
+        ACTIVE(0.4);
 
         public final double position;
 
@@ -57,7 +58,7 @@ public class ControlClaw implements Subsystem, TelemetryObservable {
     }
 
     private final ArraySelect<PivotState> pivotStates = new ArraySelect<>(PivotState.values());
-    private boolean isClawOpen = true;
+    private boolean isClawOpen = false;
 
 
     public ControlClaw(HardwareMap hw){
@@ -76,6 +77,7 @@ public class ControlClaw implements Subsystem, TelemetryObservable {
 
         setElbowPositions(ElbowState.PASSTHROUGH.position);
         claw.setPosition(ClawState.CLOSED.position);
+        isClawOpen = false;
         pivot.setPosition(PivotState.ONEEIGHTY.position);
         pivotStates.setSelected(5); // Set the selected pivot state to the one at the fifth index
     }
@@ -105,6 +107,8 @@ public class ControlClaw implements Subsystem, TelemetryObservable {
 
     public Action setClawPosition(ClawState state){
         return (TelemetryPacket packet) -> {
+            if(state == ClawState.OPEN) isClawOpen = true;
+            else if(state == ClawState.CLOSED) isClawOpen = false;
             claw.setPosition(state.position);
             return false;
         };

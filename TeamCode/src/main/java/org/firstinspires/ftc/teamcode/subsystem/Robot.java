@@ -177,7 +177,7 @@ public class Robot {
                 controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
                 slides.setStateTo(Slides.State.CLIP_HIGH_CHAMBER),
                 arm.moveTo(Arm.State.ACTIVE),
-                controlClaw.setElbowPosition(ControlClaw.ElbowState.ACTIVE),
+                controlClaw.setElbowPosition(ControlClaw.ElbowState.CLIP),
                 new SleepAction(1),
                 controlClaw.setClawPosition(ControlClaw.ClawState.OPEN)
         );
