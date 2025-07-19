@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -37,7 +39,7 @@ public class Slides implements Subsystem, TelemetryObservable {
         ACTIVE(750), // 380
         //INBETWEEN(800),
         //HOVER(1200), // 760
-        CLIPPER(1600), //1650
+        CLIPPER(1800), //1650
         //HANG(2650), // 1700
         HIGH_RUNG(4800), // 2000
         //CLIP_HANG(5000), //3200
@@ -71,42 +73,22 @@ public class Slides implements Subsystem, TelemetryObservable {
         controller = new PIDController(coefficients.p, coefficients.i, coefficients.d);
     }
 
-    @Override
-    public void periodic() {
-        target = positions.getSelected().position;
-        double p = coefficients.p;
-        double i = coefficients.i;
-        double d = coefficients.d;
-        double f = coefficients.f;
-
-        controller.setPID(p, i, d);
-        int armPos = leftSlide.getCurrentPosition();
-        double pid = controller.calculate(armPos, target);
-        double power = (pid + f) * (12.0 / voltageSensor.getVoltage()); // Compensate for voltage discrepencies
-
-        leftSlide.setPower(power);
-        rightSlide.setPower(power);
-    }
-
     public Action setStateTo(State state){
-        return (TelemetryPacket packet) -> {
-            positions.setSelected(state);
-            return false;
-        };
+        return new SequentialAction(
+                new InstantAction(() -> {positions.setSelected(state);}),
+                moveTo(state.position)
+        );
     }
 
     public Action nextPos(){
-        return (TelemetryPacket packet) -> {
-            positions.next();
-            return false;
-        };
+        positions.next();
+        return moveTo(positions.getSelected().position);
     }
 
     public Action prevPos(){
-        return (TelemetryPacket packet) -> {
-            positions.previous();
-            return false;
-        };
+        positions.previous();
+        return moveTo(positions.getSelected().position);
+
     }
 
     /**
@@ -166,7 +148,7 @@ public class Slides implements Subsystem, TelemetryObservable {
 
     @Override
     public void updateTelemetry(Telemetry telemetry) {
-        telemetry.addData("Target", target);
+        telemetry.addData("Target", positions.getSelected());
         telemetry.addData("Left Slide Pos.", leftSlide.getCurrentPosition());
         telemetry.addData("Right Slide Pos.", rightSlide.getCurrentPosition());
     }

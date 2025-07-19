@@ -45,28 +45,28 @@ public class Robot {
                 .subscribe(driveTrain);
     }
 
-    public boolean isExtended(){
+    public boolean isExtended() {
         return isExtended;
     }
 
-    public boolean isInScoringMode(){
+    public boolean isInScoringMode() {
         return isInScoringMode;
     }
 
-    public Action extendCollection(){
+    public Action extendCollection() {
         isExtended = true;
         return new SequentialAction(
-                collectionClaw.setPivotPosition(CollectionClaw.PivotState.ONEEIGHTY),
                 collectionClaw.setClawPosition(CollectionClaw.ClawState.OPEN),
                 new ParallelAction(
                         extension.extendTo(Extension.State.EXTENDED.position),
                         collectionClaw.setElbowPosition(CollectionClaw.ElbowState.ACTIVE)
 
-                )
+                ),
+                collectionClaw.setPivotPosition(CollectionClaw.PivotState.ONEEIGHTY)
         );
     }
 
-    public Action retractCollection(){
+    public Action retractCollection() {
         isExtended = false;
         return new SequentialAction(
                 collectionClaw.setClawPosition(CollectionClaw.ClawState.CLOSED),
@@ -79,12 +79,25 @@ public class Robot {
         );
     }
 
-    public Action collectFromPassthrough(){
+    public Action retractCollectionNoRotate() {
+        isExtended = false;
+        return new SequentialAction(
+                collectionClaw.setClawPosition(CollectionClaw.ClawState.CLOSED),
+                new SleepAction(0.1),
+                new ParallelAction(
+                        extension.extendTo(Extension.State.RETRACTED.position),
+                        collectionClaw.setElbowPosition(CollectionClaw.ElbowState.PASSTHROUGH),
+                        collectionClaw.setPivotPosition(CollectionClaw.PivotState.ONEEIGHTY)
+                )
+        );
+    }
+
+    public Action collectFromPassthrough() {
         isInScoringMode = false;
         return new SequentialAction(
                 controlClaw.setPivotPosition(ControlClaw.PivotState.TWOSEVENTY),
                 controlClaw.setClawPosition(ControlClaw.ClawState.OPEN),
-                slides.moveTo(Slides.State.PASSTHROUGH.position),
+                slides.setStateTo(Slides.State.PASSTHROUGH),
                 arm.moveTo(Arm.State.PASSTHROUGH),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.PASSTHROUGH),
                 new SleepAction(0.3),
@@ -93,20 +106,31 @@ public class Robot {
         );
     }
 
-    public Action collectFromWall(){
+    public Action collectFromPassthroughNoRotate() {
         isInScoringMode = false;
         return new SequentialAction(
-                collectionClaw.setClawPosition(CollectionClaw.ClawState.OPEN),
-                new SleepAction(0.2),
-                controlClaw.setElbowPosition(ControlClaw.ElbowState.ACTIVE),
-                arm.moveTo(Arm.State.ACTIVE),
-                new SleepAction(0.1),
-                controlClaw.setClawPosition(ControlClaw.ClawState.CLOSED),
-                controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY)
+                controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
+                controlClaw.setClawPosition(ControlClaw.ClawState.OPEN),
+                slides.setStateTo(Slides.State.PASSTHROUGH),
+                arm.moveTo(Arm.State.PASSTHROUGH),
+                controlClaw.setElbowPosition(ControlClaw.ElbowState.PASSTHROUGH),
+                new SleepAction(0.3),
+                controlClaw.setClawPosition(ControlClaw.ClawState.CLOSED)
+
         );
     }
 
-    public Action passthrough(){
+    public Action collectFromWall() {
+        isInScoringMode = false;
+        return new ParallelAction(new SequentialAction(
+                arm.moveTo(Arm.State.ACTIVE),
+                controlClaw.setElbowPosition(ControlClaw.ElbowState.ACTIVE),
+                controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
+                collectionClaw.setClawPosition(CollectionClaw.ClawState.OPEN)
+        ), slides.setStateTo(Slides.State.CLIPPER));
+    }
+
+    public Action passthrough() {
         return new SequentialAction(
                 new ParallelAction(
                         retractCollection(),
@@ -119,33 +143,48 @@ public class Robot {
         );
     }
 
-    public Action moveToScore(){
+    public Action passthroughNoRotate() {
+        return new SequentialAction(
+                new ParallelAction(
+                        retractCollectionNoRotate(),
+                        resetControlArm()
+                ),
+                controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
+                slides.moveTo(Slides.State.PASSTHROUGH.position + 500),
+                new SleepAction(0.8),
+                collectFromPassthroughNoRotate(),
+                new SleepAction(0.4),
+                collectFromWall()
+        );
+    }
+
+    public Action moveToScore() {
         isInScoringMode = true;
         return new SequentialAction(
                 controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
                 controlClaw.setClawPosition(ControlClaw.ClawState.CLOSED),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.SCORE),
                 arm.moveTo(Arm.State.SCORE),
-                slides.moveTo(Slides.State.HIGH_RUNG.position)
+                slides.setStateTo(Slides.State.HIGH_RUNG)
         );
     }
 
-    public Action scoreSpecimen(){
+    public Action scoreSpecimen() {
         isInScoringMode = false;
         return new SequentialAction(
                 controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
-                slides.moveTo(Slides.State.CLIP_HIGH_CHAMBER.position),
+                slides.setStateTo(Slides.State.CLIP_HIGH_CHAMBER),
                 arm.moveTo(Arm.State.ACTIVE),
-                controlClaw.setElbowPosition(ControlClaw.ElbowState.ACTIVE),
+                controlClaw.setElbowPosition(ControlClaw.ElbowState.CLIP),
                 new SleepAction(1),
                 controlClaw.setClawPosition(ControlClaw.ClawState.OPEN)
         );
     }
 
-    public Action resetControlArm(){
+    public Action resetControlArm() {
         return new SequentialAction(
                 arm.moveTo(Arm.State.HOME),
-                slides.moveTo(Slides.State.PASSTHROUGH.position),
+                slides.setStateTo(Slides.State.PASSTHROUGH),
                 controlClaw.setClawPosition(ControlClaw.ClawState.OPEN),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.PASSTHROUGH),
                 controlClaw.setPivotPosition(ControlClaw.PivotState.TWOSEVENTY)
