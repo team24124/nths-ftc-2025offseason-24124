@@ -40,8 +40,8 @@ public class SampleStaticLL extends LinearOpMode {
         top_claw = hardwareMap.get(Servo.class, "top_claw");
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        if (limelight.getStatus().getPipelineIndex() != 4) {
-            limelight.pipelineSwitch(4); // Switch to pipeline number 0
+        if (limelight.getStatus().getPipelineIndex() != 2) {
+            limelight.pipelineSwitch(2); // Switch to pipeline number 0
         }
         limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
         front_left_motor = hardwareMap.get(DcMotor.class, "left_front");
@@ -108,11 +108,11 @@ public class SampleStaticLL extends LinearOpMode {
                             double targetX = array[1];
                             double targetY = array[2];
                             double angle = array[3];
-                            double strafeX = (targetX - 122) * kP; //righter = higher
-                            double strafeY = (targetY - 200) * kP; //closer = lower
+                            double strafeX = (targetX - 480) * kP; //righter = higher
+                            double strafeY = (targetY - 275) * kP; //closer = lower
                             telemetry.update();
 
-                            while (targetX < 118 || targetX > 126 || targetY < 196 || targetY > 204) {
+                            while (targetX < 475 || targetX > 485 || targetY < 270 || targetY > 280) {
                                 telemetry.update();
 
                                 array = limelight.getLatestResult().getPythonOutput();
@@ -149,7 +149,7 @@ public class SampleStaticLL extends LinearOpMode {
                                 }
 
 
-                                if (targetX > 118 && targetX < 122 && targetY > 196 && targetY < 204) {
+                                if (targetX > 475 && targetX < 485 && targetY > 270 && targetY < 280) {
                                     front_left_motor.setPower(0);
                                     front_right_motor.setPower(0);
                                     back_left_motor.setPower(0);
