@@ -65,11 +65,21 @@ public class Main extends OpMode {
             }
         }
 
+        if(operator.wasJustPressed(Button.B)) {
+            actions.schedule(robot.moveToBucket());
+        }
+
         // Open/Close Top Claw
-        if (driver.wasJustPressed(Button.Y)) { actions.schedule(robot.controlClaw.toggleClaw()); }
+        if (driver.wasJustPressed(Button.Y) || operator.wasJustPressed(Button.Y)) { actions.schedule(robot.controlClaw.toggleClaw()); }
 
         // Reset Top Arm to starting positions
         if(operator.wasJustPressed(Button.BACK)) { actions.schedule(robot.resetControlArm()); }
+
+        if(operator.wasJustPressed(Button.START)) {
+            robot.slides.positions.setSelected(Slides.State.HOME);
+            robot.slides.stopAndResetEncoders();
+
+        }
 
         // Control Viper Slides
         if(operator.wasJustPressed(Button.DPAD_UP)) {
@@ -77,13 +87,12 @@ public class Main extends OpMode {
         }
         if(operator.wasJustPressed(Button.DPAD_DOWN)) {
             actions.schedule(robot.slides.prevPos());
+
+            if(robot.slides.positions.getSelected() == Slides.State.HOME) robot.slides.stopAndResetEncoders();
         }
 
         if(operator.wasJustPressed(Button.DPAD_LEFT)) { 
-            actions.schedule(new SequentialAction(
-                    robot.slides.setStateTo(Slides.State.HOME),
-                    robot.collectFromWall()
-            ));
+            actions.schedule(robot.collectFromWall());
         }
 
         // Collection Claw Pivots

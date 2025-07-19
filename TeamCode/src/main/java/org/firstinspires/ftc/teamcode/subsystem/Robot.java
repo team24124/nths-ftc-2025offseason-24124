@@ -122,12 +122,13 @@ public class Robot {
 
     public Action collectFromWall() {
         isInScoringMode = false;
-        return new ParallelAction(new SequentialAction(
+        return new SequentialAction(
                 arm.moveTo(Arm.State.ACTIVE),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.ACTIVE),
                 controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
-                collectionClaw.setClawPosition(CollectionClaw.ClawState.OPEN)
-        ), slides.setStateTo(Slides.State.CLIPPER));
+                collectionClaw.setClawPosition(CollectionClaw.ClawState.OPEN),
+                slides.setStateTo(Slides.State.CLIPPER)
+        );
     }
 
     public Action passthrough() {
@@ -150,7 +151,7 @@ public class Robot {
                         resetControlArm()
                 ),
                 controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
-                slides.moveTo(Slides.State.PASSTHROUGH.position + 500),
+                // slides.moveTo(Slides.State.PASSTHROUGH.position + 500), remove in between slide movement
                 new SleepAction(0.8),
                 collectFromPassthroughNoRotate(),
                 new SleepAction(0.4),
@@ -169,6 +170,17 @@ public class Robot {
         );
     }
 
+    public Action moveToBucket(){
+        isInScoringMode = true;
+        return new SequentialAction(
+                slides.setStateTo(Slides.State.HIGH_BUCKET),
+                arm.moveTo(Arm.State.WALL),
+                controlClaw.setClawPosition(ControlClaw.ClawState.CLOSED),
+                controlClaw.setElbowPosition(ControlClaw.ElbowState.ACTIVE),
+                controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY)
+        );
+    }
+
     public Action scoreSpecimen() {
         isInScoringMode = false;
         return new SequentialAction(
@@ -184,7 +196,6 @@ public class Robot {
     public Action resetControlArm() {
         return new SequentialAction(
                 arm.moveTo(Arm.State.HOME),
-                slides.setStateTo(Slides.State.PASSTHROUGH),
                 controlClaw.setClawPosition(ControlClaw.ClawState.OPEN),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.PASSTHROUGH),
                 controlClaw.setPivotPosition(ControlClaw.PivotState.TWOSEVENTY)

@@ -35,14 +35,9 @@ public class Slides implements Subsystem, TelemetryObservable {
     // TODO: Tune these positions (maybe)
     public enum State {
         HOME(0),
-        PASSTHROUGH(400),
-        ACTIVE(750), // 380
-        //INBETWEEN(800),
-        //HOVER(1200), // 760
+        PASSTHROUGH(800),
         CLIPPER(1800), //1650
-        //HANG(2650), // 1700
         HIGH_RUNG(4800), // 2000
-        //CLIP_HANG(5000), //3200
         CLIP_HIGH_CHAMBER(7000), // 4000
         HIGH_BUCKET(10000); //5800
 
@@ -74,10 +69,8 @@ public class Slides implements Subsystem, TelemetryObservable {
     }
 
     public Action setStateTo(State state){
-        return new SequentialAction(
-                new InstantAction(() -> {positions.setSelected(state);}),
-                moveTo(state.position)
-        );
+        positions.setSelected(state);
+        return moveTo(state.position);
     }
 
     public Action nextPos(){
