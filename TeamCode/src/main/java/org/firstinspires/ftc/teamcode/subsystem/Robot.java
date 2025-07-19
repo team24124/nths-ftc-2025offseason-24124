@@ -19,6 +19,7 @@ public class Robot {
     public Extension extension;
     public Slides slides;
     public DriveTrain driveTrain;
+    public Limelight limelight;
 
     public TelemetryMaster telemetryMaster;
 
@@ -34,6 +35,8 @@ public class Robot {
 
         Pose2d startPose = new Pose2d(new Vector2d(0, 0), Math.toRadians(0));
         driveTrain = new FieldCentricDriveTrain(hw, startPose);
+
+        limelight = new Limelight(hw, driveTrain);
 
         telemetryMaster = new TelemetryMaster(telemetry);
         telemetryMaster

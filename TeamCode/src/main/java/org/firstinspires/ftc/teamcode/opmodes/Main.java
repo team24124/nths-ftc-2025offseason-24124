@@ -47,6 +47,10 @@ public class Main extends OpMode {
             robot.driveTrain.getDrive().localizer.setPose(new Pose2d(current, 0));
         }
 
+        if(driver.wasJustPressed(Button.A)) {
+            actions.schedule(robot.limelight.navigateToBlock());
+        }
+
         // Toggle between extending and completely the rest of the passthrough
         if(operator.wasJustPressed(Button.A)) {
             if(!robot.isExtended()){
