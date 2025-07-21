@@ -76,9 +76,10 @@ public class Robot {
                 new SleepAction(0.1),
                 new ParallelAction(
                         extension.extendTo(Extension.State.RETRACTED.position),
-                        collectionClaw.setElbowPosition(CollectionClaw.ElbowState.PASSTHROUGH),
-                        collectionClaw.setPivotPosition(CollectionClaw.PivotState.NINETY)
-                )
+                        collectionClaw.setElbowPosition(CollectionClaw.ElbowState.PASSTHROUGH)
+                ),
+                new SleepAction(1),
+                collectionClaw.setPivotPosition(CollectionClaw.PivotState.TWOSEVENTY)
         );
     }
 
