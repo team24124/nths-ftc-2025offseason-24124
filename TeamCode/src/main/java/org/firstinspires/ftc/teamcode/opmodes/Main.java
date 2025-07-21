@@ -38,76 +38,100 @@ public class Main extends OpMode {
         double rx = gamepad1.right_stick_x;
 
         // Change speeds of drive train
-        if(driver.wasJustPressed(Button.LEFT_BUMPER)) { actions.schedule(new InstantAction(robot.driveTrain.getSpeeds()::previous)); }
-        if(driver.wasJustPressed(Button.RIGHT_BUMPER)) { actions.schedule(new InstantAction(robot.driveTrain.getSpeeds()::next)); }
+        if (driver.wasJustPressed(Button.LEFT_BUMPER)) {
+            actions.schedule(new InstantAction(robot.driveTrain.getSpeeds()::previous));
+        }
+        if (driver.wasJustPressed(Button.RIGHT_BUMPER)) {
+            actions.schedule(new InstantAction(robot.driveTrain.getSpeeds()::next));
+        }
 
         // Reset the orientation for the the field-centric drive
-        if(driver.wasJustPressed(Button.START)) {
+        if (driver.wasJustPressed(Button.START)) {
             Vector2d current = robot.driveTrain.getDrive().localizer.getPose().position;
             robot.driveTrain.getDrive().localizer.setPose(new Pose2d(current, 0));
         }
 
-        if(driver.wasJustPressed(Button.A)) {
+        if (driver.wasJustPressed(Button.A)) {
             actions.schedule(robot.limelight.navigateToBlock());
         }
 
         // Toggle between extending and completely the rest of the passthrough
-        if(operator.wasJustPressed(Button.A)) {
-            if(!robot.isExtended()){
+        if (operator.wasJustPressed(Button.A)) {
+            if (!robot.isExtended()) {
                 actions.schedule(robot.extendCollection());
-            }else{
+            } else {
                 actions.schedule(robot.passthrough());
             }
         }
 
         // Toggle the top claw between scoring and collecting
-        if(operator.wasJustPressed(Button.X)){
-            if(robot.isInScoringMode()){
+        if (operator.wasJustPressed(Button.X)) {
+            if (robot.isInScoringMode()) {
                 actions.schedule(robot.scoreSpecimen());
-            }else {
+            } else {
                 actions.schedule(robot.moveToScore());
             }
         }
 
-        if(operator.wasJustPressed(Button.B)) {
+        if (operator.wasJustPressed(Button.B)) {
             actions.schedule(robot.moveToBucket());
         }
 
         // Open/Close Top Claw
-        if (driver.wasJustPressed(Button.Y) || operator.wasJustPressed(Button.Y)) { actions.schedule(robot.controlClaw.toggleClaw()); }
+        if (driver.wasJustPressed(Button.Y) || operator.wasJustPressed(Button.Y)) {
+            actions.schedule(robot.controlClaw.toggleClaw());
+        }
 
         // Reset Top Arm to starting positions
-        if(operator.wasJustPressed(Button.BACK)) { actions.schedule(robot.resetControlArm()); }
+        if (operator.wasJustPressed(Button.BACK)) {
+            actions.schedule(robot.resetControlArm());
+        }
 
-        if(operator.wasJustPressed(Button.START)) {
+        if (operator.wasJustPressed(Button.START)) {
             robot.slides.positions.setSelected(Slides.State.HOME);
             robot.slides.stopAndResetEncoders();
 
         }
 
         // Control Viper Slides
-        if(operator.wasJustPressed(Button.DPAD_UP)) {
-            actions.schedule(robot.slides.nextPos());
+        if (operator.wasJustPressed(Button.DPAD_UP)) {
+            if(!robot.slides.isMoving){
+                actions.schedule(robot.slides.nextPos());
+            }
         }
-        if(operator.wasJustPressed(Button.DPAD_DOWN)) {
-            actions.schedule(robot.slides.prevPos());
-
-            if(robot.slides.positions.getSelected() == Slides.State.HOME) robot.slides.stopAndResetEncoders();
+        if (operator.wasJustPressed(Button.DPAD_DOWN)) {
+            if(!robot.slides.isMoving){
+                actions.schedule(new SequentialAction(
+                        robot.slides.prevPos(),
+                        new InstantAction(
+                                () -> {
+                                    if (robot.slides.positions.getSelected() == Slides.State.HOME)
+                                        robot.slides.stopAndResetEncoders();
+                                }
+                        )
+                ));
+            }
         }
 
-        if(operator.wasJustPressed(Button.DPAD_LEFT)) { 
-            actions.schedule(robot.collectFromWall());
+        if (operator.wasJustPressed(Button.DPAD_LEFT)) {
+            if(!robot.slides.isMoving){
+                actions.schedule(robot.collectFromWall());
+            }
         }
 
         // Collection Claw Pivots
-        if(operator.wasJustPressed(Button.LEFT_BUMPER)) { actions.schedule(robot.collectionClaw.prevPivot()); }
-        if(operator.wasJustPressed(Button.RIGHT_BUMPER)) { actions.schedule(robot.collectionClaw.nextPivot()); }
+        if (operator.wasJustPressed(Button.LEFT_BUMPER)) {
+            actions.schedule(robot.collectionClaw.prevPivot());
+        }
+        if (operator.wasJustPressed(Button.RIGHT_BUMPER)) {
+            actions.schedule(robot.collectionClaw.nextPivot());
+        }
 
         // Move the arm back and forth using triggers
-        if(operator.getTrigger(Trigger.RIGHT_TRIGGER) > 0 || operator.getTrigger(Trigger.LEFT_TRIGGER) > 0){
+        if (operator.getTrigger(Trigger.RIGHT_TRIGGER) > 0 || operator.getTrigger(Trigger.LEFT_TRIGGER) > 0) {
             double rightTrigger = operator.getTrigger(Trigger.RIGHT_TRIGGER);
             double leftTrigger = operator.getTrigger(Trigger.LEFT_TRIGGER);
-            int fudgedArmPosition = (int)(robot.arm.getFudgeFactor() * (rightTrigger + -leftTrigger));
+            int fudgedArmPosition = (int) (robot.arm.getFudgeFactor() * (rightTrigger + -leftTrigger));
             actions.schedule(
                     robot.arm.moveTo((robot.arm.getCurrentState().position - fudgedArmPosition))
             );

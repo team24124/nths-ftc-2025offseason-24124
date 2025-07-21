@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.SequentialAction;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -19,6 +17,7 @@ import org.firstinspires.ftc.teamcode.utility.selections.ArraySelect;
 import org.firstinspires.ftc.teamcode.utility.subsystems.Subsystem;
 import org.firstinspires.ftc.teamcode.utility.telemetry.TelemetryObservable;
 
+@Config
 public class Slides implements Subsystem, TelemetryObservable {
     private final DcMotorEx leftSlide, rightSlide;
     private final PIDController controller;
@@ -38,7 +37,7 @@ public class Slides implements Subsystem, TelemetryObservable {
         PASSTHROUGH(800),
         CLIPPER(1800), //1650
         HIGH_RUNG(4800), // 2000
-        CLIP_HIGH_CHAMBER(7000), // 4000
+        CLIP_HIGH_CHAMBER(8000), // 4000
         HIGH_BUCKET(10000); //5800
 
         public final int position;
@@ -51,8 +50,9 @@ public class Slides implements Subsystem, TelemetryObservable {
 
     // Create a selection array from all SlideState values
     public final ArraySelect<State> positions = new ArraySelect<>(State.values());
+    public boolean isMoving = false;
 
-    public Slides(HardwareMap hw){
+    public Slides(HardwareMap hw) {
         leftSlide = hw.get(DcMotorEx.class, "left_slide");
         rightSlide = hw.get(DcMotorEx.class, "right_slide");
 
@@ -68,17 +68,17 @@ public class Slides implements Subsystem, TelemetryObservable {
         controller = new PIDController(coefficients.p, coefficients.i, coefficients.d);
     }
 
-    public Action setStateTo(State state){
+    public Action setStateTo(State state) {
         positions.setSelected(state);
         return moveTo(state.position);
     }
 
-    public Action nextPos(){
+    public Action nextPos() {
         positions.next();
         return moveTo(positions.getSelected().position);
     }
 
-    public Action prevPos(){
+    public Action prevPos() {
         positions.previous();
         return moveTo(positions.getSelected().position);
 
@@ -92,6 +92,7 @@ public class Slides implements Subsystem, TelemetryObservable {
      */
     public Action moveTo(int target) {
         return (TelemetryPacket packet) -> {
+            isMoving = true;
             int slidePos = leftSlide.getCurrentPosition();
             double tolerance = 0.1 * target + 10; // Check if we are within 1% of the target, with a constant of 1
 
@@ -111,6 +112,7 @@ public class Slides implements Subsystem, TelemetryObservable {
 
             if (Utilities.isBetween(slidePos, target - tolerance, target + tolerance)) {
                 setPower(f);
+                isMoving = false;
                 return false; // Stop the command
             } else {
                 return true; // Otherwise continue running it
@@ -144,6 +146,7 @@ public class Slides implements Subsystem, TelemetryObservable {
         telemetry.addData("Target", positions.getSelected());
         telemetry.addData("Left Slide Pos.", leftSlide.getCurrentPosition());
         telemetry.addData("Right Slide Pos.", rightSlide.getCurrentPosition());
+        telemetry.addData("Is Moving", isMoving);
     }
 
     @Override

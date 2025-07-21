@@ -54,7 +54,7 @@ public class Arm implements Subsystem, TelemetryObservable {
         return (TelemetryPacket packet) -> {
             armMotor.setTargetPosition(target);
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            armMotor.setPower(0.8);
+            armMotor.setPower(0.5);
 
             return false;
         };
