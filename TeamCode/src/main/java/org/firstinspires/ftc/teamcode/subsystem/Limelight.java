@@ -6,24 +6,32 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.utility.selections.ArraySelect;
 import org.firstinspires.ftc.teamcode.utility.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.utility.subsystems.Subsystem;
 import org.firstinspires.ftc.teamcode.utility.telemetry.TelemetryObservable;
 
-public class Limelight implements Subsystem  {
+public class Limelight implements Subsystem, TelemetryObservable  {
     private final Limelight3A limelight;
     private final DriveTrain driveTrain;
+
+    public final ArraySelect<Integer> pipelines;
 
     private final double kP = 0.0022; //add to teleop
     boolean toggleSearch = false; //add to teleop
 
     public Limelight(HardwareMap hw, DriveTrain driveTrain) {
         limelight = hw.get(Limelight3A.class, "limelight");
+        pipelines = new ArraySelect<>(new Integer[]{0, 1, 2});
+
+        // 0 = Red, 1 = Blue, 2 = Yellow
+        limelight.pipelineSwitch(2);
         this.driveTrain = driveTrain;
     }
 
     public Action navigateToBlock(){
         return (TelemetryPacket packet) -> {
+            limelight.pipelineSwitch(pipelines.getSelected());
             if (limelight.isRunning() && limelight.getLatestResult() != null) {
                 if (limelight.getLatestResult().getPythonOutput() != null && limelight.getLatestResult().getPythonOutput()[0] == 1) {
                     double[] array = limelight.getLatestResult().getPythonOutput();
@@ -74,6 +82,11 @@ public class Limelight implements Subsystem  {
 
             return false;
         };
+    }
+
+    @Override
+    public void updateTelemetry(Telemetry telemetry) {
+        telemetry.addData("Selected Pipeline", pipelines.getSelected());
     }
 
     @Override

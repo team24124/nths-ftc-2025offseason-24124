@@ -48,6 +48,7 @@ public class ControlClaw implements Subsystem, TelemetryObservable {
         PASSTHROUGH(0.12),
         SCORE(0.6),
         CLIP(0.7),
+        BUCKET(0.8),
         ACTIVE(0.4);
 
         public final double position;
@@ -146,6 +147,10 @@ public class ControlClaw implements Subsystem, TelemetryObservable {
             setElbowPositions(state.position);
             return false;
         };
+    }
+
+    public boolean isCollecting(){
+        return leftElbow.getPosition() == ElbowState.ACTIVE.position;
     }
 
     public void setElbowPositions(double position){

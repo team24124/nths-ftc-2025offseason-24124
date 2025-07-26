@@ -37,7 +37,7 @@ public class SpecimenAuto extends LinearOpMode {
                         .strafeToLinearHeading(new Vector2d(43, -49), Math.toRadians(96))
 //                        .splineToConstantHeading(new Vector2d(-5, -40), 270)
 //                        .splineToLinearHeading(new Pose2d(new Vector2d(42, -48), Math.toRadians(93)), 0)
-                        .afterTime(0, robot.slides.setStateTo(Slides.State.PASSTHROUGH))
+                        //.afterTime(0, robot.slides.setStateTo(Slides.State.PASSTHROUGH))
                         .stopAndAdd(robot.extendCollection()) // Grab first specimen
                         .waitSeconds(1.5)
                         .stopAndAdd(robot.passthrough())

@@ -18,7 +18,7 @@ public class Arm implements Subsystem, TelemetryObservable {
         HOME(0),
         PASSTHROUGH(170),
         SCORE(300),
-        WALL(-150),
+        WALL(-1200), // 0
         ACTIVE(-400);
 
         public final int position;
@@ -38,7 +38,7 @@ public class Arm implements Subsystem, TelemetryObservable {
 
         armMotor.setTargetPosition(State.HOME.position);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armMotor.setPower(0.5);
+        armMotor.setPower(0.2);
 
         current = State.HOME;
     }
@@ -54,7 +54,7 @@ public class Arm implements Subsystem, TelemetryObservable {
         return (TelemetryPacket packet) -> {
             armMotor.setTargetPosition(target);
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            armMotor.setPower(0.5);
+            armMotor.setPower(0.2);
 
             return false;
         };
@@ -71,11 +71,17 @@ public class Arm implements Subsystem, TelemetryObservable {
             int target = state.position;
             armMotor.setTargetPosition(target);
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            armMotor.setPower(0.5);
+            armMotor.setPower(0.2);
             current = state;
 
             return false;
         };
+    }
+
+    public void setPosition(int position) {
+        armMotor.setTargetPosition(position);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotor.setPower(0.2);
     }
 
     /**

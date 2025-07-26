@@ -46,6 +46,7 @@ public class CollectionClaw implements Subsystem, TelemetryObservable {
 
     public enum ElbowState {
         PASSTHROUGH(0.85),
+        HOVER(0.22),
         ACTIVE(0.17);
 
         public final double position;
@@ -82,6 +83,13 @@ public class CollectionClaw implements Subsystem, TelemetryObservable {
     public Action setPivotPosition(PivotState state){
         return (TelemetryPacket packet) -> {
             pivot.setPosition(state.position);
+            return false;
+        };
+    }
+
+    public Action setPivotPosition(double position){
+        return (TelemetryPacket packet) -> {
+            pivot.setPosition(position);
             return false;
         };
     }
@@ -146,6 +154,14 @@ public class CollectionClaw implements Subsystem, TelemetryObservable {
     public void setElbowPositions(double position){
         leftElbow.setPosition(position);
         rightElbow.setPosition(position);
+    }
+
+    public void setClaw(double position){
+        claw.setPosition(position);
+    }
+
+    public void setPivot(double position){
+        pivot.setPosition(position);
     }
 
     @Override

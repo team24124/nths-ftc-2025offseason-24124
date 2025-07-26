@@ -24,7 +24,7 @@ public class SampleStaticManualLL extends LinearOpMode {
     private Servo bottom_claw;
     private Servo top_pivot;
     private Servo top_claw;
-    double kP = 0.0022; //add to teleop
+    double kP = 0.003; //0.0022; //add to teleop
     boolean toggleSearch = false; //add to teleop
     double x, y, r;
     @Override
@@ -151,11 +151,11 @@ public class SampleStaticManualLL extends LinearOpMode {
                         double baseX = 0;
                         double baseY = 0;
 
-                        if (strafeX < 0) baseX = -0.1;
-                        else if (strafeX > 0) baseX = 0.1;
+                        if (strafeX < 0) baseX = -0.2;
+                        else if (strafeX > 0) baseX = 0.2;
 
-                        if (strafeY < 0) baseY = -0.1;
-                        else if (strafeY > 0) baseY = 0.1;
+                        if (strafeY < 0) baseY = -0.2;
+                        else if (strafeY > 0) baseY = 0.2;
 
                         // Calculate the power for each wheel
                         double frontLeftPower = -strafeY + strafeX + baseX - baseY;

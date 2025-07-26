@@ -16,24 +16,33 @@ import org.firstinspires.ftc.teamcode.subsystem.Robot;
 public class SampleAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        Pose2d beginPose = new Pose2d(8, -62, 90);
+        Pose2d beginPose = new Pose2d(-32, -62, Math.toRadians(90));
 
-        MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
+        Robot robot = new Robot(hardwareMap, telemetry);
 
         waitForStart();
 
         Actions.runBlocking(
-                drive.actionBuilder(beginPose)
-                        .splineToConstantHeading(new Vector2d(5, -32), 90)
-                        .stopAndAdd(new InstantAction(()->{})) // Score preloaded specimen
-                        .strafeTo(new Vector2d(5, -40))
+                robot.driveTrain.getDrive().actionBuilder(beginPose)
+                        // Deposit preloaded Sample
+                        .splineToLinearHeading(new Pose2d(-48, -50, Math.toRadians(45)), Math.toRadians(225))
+                        .waitSeconds(4)
 
-                        .splineToConstantHeading(new Vector2d(48, -40), 90)
-                        .stopAndAdd(new InstantAction(()->{})) // Grab first specimen
-                        .splineToConstantHeading(new Vector2d(48, -60), 90)
-                        .stopAndAdd(new InstantAction(()->{})) // Deposit and grab from observation zone
-                        .splineToConstantHeading(new Vector2d(7, -32), 90)
-                        .stopAndAdd(new InstantAction(()->{})) // Score first specimen
+                        // Grab Sample
+                        .splineToLinearHeading(new Pose2d(-48, -44, Math.toRadians(90)), Math.toRadians(90))
+                        .waitSeconds(2)
+
+                        // Deposit in High Bucket
+                        .splineToLinearHeading(new Pose2d(-48, -50, Math.toRadians(45)), Math.toRadians(225))
+                        .waitSeconds(4)
+
+                        // Grab Sample
+                        .splineToLinearHeading(new Pose2d(-52, -44, Math.toRadians(90)), Math.toRadians(90))
+                        .waitSeconds(2)
+
+                        // Deposit in High Bucket
+                        .splineToLinearHeading(new Pose2d(-48, -50, Math.toRadians(45)), Math.toRadians(225))
+                        .waitSeconds(4)
                         .build());
     }
 }

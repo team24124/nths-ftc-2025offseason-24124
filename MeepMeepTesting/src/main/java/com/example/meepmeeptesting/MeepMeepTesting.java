@@ -16,27 +16,26 @@ public class MeepMeepTesting {
                 .build();
 
         myBot.runAction(
-                myBot.getDrive().actionBuilder(new Pose2d(8, -62, Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(-6, -30), 90)
-                .stopAndAdd(() -> {})
-                .strafeToConstantHeading(new Vector2d(42, -49))
-//                .splineToConstantHeading(new Vector2d(-6, -36), 270)
-//                .splineToConstantHeading(new Vector2d(42, -49), 0)
-                .stopAndAdd(() -> {})
-                .waitSeconds(0.1)
-                .stopAndAdd(() -> {}) // Grab first specimen
-                .waitSeconds(2)
-                .stopAndAdd(() -> {})
-                .waitSeconds(2)
-                .stopAndAdd(() -> {})
-                .strafeTo(new Vector2d(48, -49))
-                .stopAndAdd(() -> {}) // Grab second specimen
-                .waitSeconds(2)
-                .stopAndAdd(() -> {})
-                .waitSeconds(2)
-                .stopAndAdd(() -> {})
-                .strafeToLinearHeading(new Vector2d(54, -49), Math.toRadians(45))
-                .build());
+                myBot.getDrive().actionBuilder(new Pose2d(-32, -62, Math.toRadians(90)))
+                        .splineToLinearHeading(new Pose2d(-48, -50, Math.toRadians(45)), Math.toRadians(225))
+                        .waitSeconds(4)
+
+                        // Grab Sample
+                        .splineToLinearHeading(new Pose2d(-48, -44, Math.toRadians(90)), Math.toRadians(90))
+                        .waitSeconds(2)
+
+                        // Deposit in High Bucket
+                        .splineToLinearHeading(new Pose2d(-48, -50, Math.toRadians(45)), Math.toRadians(225))
+                        .waitSeconds(4)
+
+                        // Grab Sample
+                        .splineToLinearHeading(new Pose2d(-52, -44, Math.toRadians(90)), Math.toRadians(90))
+                        .waitSeconds(2)
+
+                        // Deposit in High Bucket
+                        .splineToLinearHeading(new Pose2d(-48, -50, Math.toRadians(45)), Math.toRadians(225))
+                        .waitSeconds(4)
+                        .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTO_THE_DEEP_JUICE_DARK)
                 .setDarkMode(true)

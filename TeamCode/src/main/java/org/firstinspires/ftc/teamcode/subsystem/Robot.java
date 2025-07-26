@@ -19,7 +19,7 @@ public class Robot {
     public Extension extension;
     public Slides slides;
     public DriveTrain driveTrain;
-    public Limelight limelight;
+    //public Limelight limelight;
 
     public TelemetryMaster telemetryMaster;
 
@@ -34,9 +34,9 @@ public class Robot {
         slides = new Slides(hw);
 
         Pose2d startPose = new Pose2d(new Vector2d(0, 0), Math.toRadians(0));
-        driveTrain = new FieldCentricDriveTrain(hw, startPose);
+        driveTrain = new RobotCentricDriveTrain(hw, startPose);
 
-        limelight = new Limelight(hw, driveTrain);
+        //limelight = new Limelight(hw, driveTrain);
 
         telemetryMaster = new TelemetryMaster(telemetry);
         telemetryMaster
@@ -59,10 +59,11 @@ public class Robot {
     public Action extendCollection() {
         isExtended = true;
         return new SequentialAction(
+                arm.moveTo(Arm.State.HOME),
                 collectionClaw.setClawPosition(CollectionClaw.ClawState.OPEN),
                 new ParallelAction(
                         extension.extendTo(Extension.State.EXTENDED.position),
-                        collectionClaw.setElbowPosition(CollectionClaw.ElbowState.ACTIVE)
+                        collectionClaw.setElbowPosition(CollectionClaw.ElbowState.HOVER)
 
                 ),
                 collectionClaw.setPivotPosition(CollectionClaw.PivotState.ONEEIGHTY)
@@ -72,6 +73,7 @@ public class Robot {
     public Action retractCollection() {
         isExtended = false;
         return new SequentialAction(
+                collectionClaw.setElbowPosition(CollectionClaw.ElbowState.ACTIVE),
                 collectionClaw.setClawPosition(CollectionClaw.ClawState.CLOSED),
                 new SleepAction(0.1),
                 new ParallelAction(
@@ -101,7 +103,7 @@ public class Robot {
         return new SequentialAction(
                 controlClaw.setPivotPosition(ControlClaw.PivotState.TWOSEVENTY),
                 controlClaw.setClawPosition(ControlClaw.ClawState.OPEN),
-                slides.setStateTo(Slides.State.PASSTHROUGH),
+                //slides.setStateTo(Slides.State.PASSTHROUGH),
                 arm.moveTo(Arm.State.PASSTHROUGH),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.PASSTHROUGH),
                 new SleepAction(0.3),
@@ -115,7 +117,7 @@ public class Robot {
         return new SequentialAction(
                 controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY),
                 controlClaw.setClawPosition(ControlClaw.ClawState.OPEN),
-                slides.setStateTo(Slides.State.PASSTHROUGH),
+                //slides.setStateTo(Slides.State.PASSTHROUGH),
                 arm.moveTo(Arm.State.PASSTHROUGH),
                 controlClaw.setElbowPosition(ControlClaw.ElbowState.PASSTHROUGH),
                 new SleepAction(0.3),
@@ -180,7 +182,7 @@ public class Robot {
                 slides.setStateTo(Slides.State.HIGH_BUCKET),
                 arm.moveTo(Arm.State.WALL),
                 controlClaw.setClawPosition(ControlClaw.ClawState.CLOSED),
-                controlClaw.setElbowPosition(ControlClaw.ElbowState.ACTIVE),
+                controlClaw.setElbowPosition(ControlClaw.ElbowState.BUCKET),
                 controlClaw.setPivotPosition(ControlClaw.PivotState.ONEEIGHTY)
         );
     }

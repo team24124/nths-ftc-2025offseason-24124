@@ -16,14 +16,12 @@ import org.firstinspires.ftc.teamcode.utility.Utilities;
 import org.firstinspires.ftc.teamcode.utility.selections.ArraySelect;
 import org.firstinspires.ftc.teamcode.utility.subsystems.Subsystem;
 import org.firstinspires.ftc.teamcode.utility.telemetry.TelemetryObservable;
-
 @Config
 public class Slides implements Subsystem, TelemetryObservable {
     private final DcMotorEx leftSlide, rightSlide;
     private final PIDController controller;
     private final VoltageSensor voltageSensor;
 
-    public static int target = 0;
     public static PIDFCoefficients coefficients = new PIDFCoefficients(
             0.00945,
             0,
@@ -34,10 +32,10 @@ public class Slides implements Subsystem, TelemetryObservable {
     // TODO: Tune these positions (maybe)
     public enum State {
         HOME(0),
-        PASSTHROUGH(800),
-        CLIPPER(1800), //1650
-        HIGH_RUNG(4800), // 2000
-        CLIP_HIGH_CHAMBER(8000), // 4000
+        //PASSTHROUGH(800),
+        CLIPPER(2500), //1650 1800
+        HIGH_RUNG(4500), // 2000 4800
+        CLIP_HIGH_CHAMBER(8000), // 4000 8000
         HIGH_BUCKET(10000); //5800
 
         public final int position;
@@ -66,6 +64,28 @@ public class Slides implements Subsystem, TelemetryObservable {
 
         voltageSensor = hw.get(VoltageSensor.class, "Control Hub");
         controller = new PIDController(coefficients.p, coefficients.i, coefficients.d);
+    }
+
+    @Override
+    public void periodic() {
+        int slidePos = leftSlide.getCurrentPosition();
+        int target = positions.getSelected().position;
+        //double tolerance = 0.1 * target + 10; // Check if we are within 1% of the target, with a constant of 1
+
+        double p = coefficients.p, i = coefficients.i, d = coefficients.d, f = coefficients.f;
+
+        // FTCDashboard Telemetry
+//        packet.put("Position", slidePos);
+//        packet.put("Target", target);
+//        packet.put("Position Reached?", Utilities.isBetween(slidePos, target - tolerance, target + tolerance));
+
+        controller.setPID(p, i, d);
+        double pid = controller.calculate(slidePos, target);
+        double power = (pid + f) * (12.0 / voltageSensor.getVoltage()); // Compensate for voltages
+        setPower(power);
+
+//        packet.put("Power", power);
+
     }
 
     public Action setStateTo(State state) {
