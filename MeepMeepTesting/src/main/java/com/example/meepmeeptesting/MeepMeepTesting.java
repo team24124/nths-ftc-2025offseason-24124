@@ -16,25 +16,13 @@ public class MeepMeepTesting {
                 .build();
 
         myBot.runAction(
-                myBot.getDrive().actionBuilder(new Pose2d(-32, -62, Math.toRadians(90)))
-                        .splineToLinearHeading(new Pose2d(-48, -50, Math.toRadians(45)), Math.toRadians(225))
-                        .waitSeconds(4)
-
-                        // Grab Sample
-                        .splineToLinearHeading(new Pose2d(-48, -44, Math.toRadians(90)), Math.toRadians(90))
+                myBot.getDrive().actionBuilder(new Pose2d(8, -62, Math.toRadians(90)))
+                        .splineToConstantHeading(new Vector2d(-4, -32), Math.toRadians(90))
                         .waitSeconds(2)
-
-                        // Deposit in High Bucket
-                        .splineToLinearHeading(new Pose2d(-48, -50, Math.toRadians(45)), Math.toRadians(225))
-                        .waitSeconds(4)
-
-                        // Grab Sample
-                        .splineToLinearHeading(new Pose2d(-52, -44, Math.toRadians(90)), Math.toRadians(90))
+                        .splineToConstantHeading(new Vector2d(-4, -38), Math.toRadians(270))
+                        .splineToLinearHeading(new Pose2d(64, -60, Math.toRadians(0)), Math.toRadians(0))
+                        .splineToLinearHeading(new Pose2d(-4, -32, Math.toRadians(90)), Math.toRadians(90))
                         .waitSeconds(2)
-
-                        // Deposit in High Bucket
-                        .splineToLinearHeading(new Pose2d(-48, -50, Math.toRadians(45)), Math.toRadians(225))
-                        .waitSeconds(4)
                         .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTO_THE_DEEP_JUICE_DARK)
