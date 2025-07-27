@@ -78,31 +78,31 @@ public class Main extends OpMode {
         }
 
         // Toggle between extending and completely the rest of the passthrough
-        if (operator.wasJustPressed(Button.A)) {
-            if (!robot.isExtended() && !robot.controlClaw.isCollecting()) {
-                actions.schedule(robot.extendCollection());
-            } else {
-                actions.schedule(robot.passthrough());
-            }
-        }
-
-        // Toggle the top claw between scoring and collecting
-        if (operator.wasJustPressed(Button.X)) {
-            if (robot.isInScoringMode() && !robot.isExtended()) {
-                actions.schedule(robot.scoreSpecimen());
-            } else {
-                actions.schedule(robot.moveToScore());
-            }
-        }
-
-        if (operator.wasJustPressed(Button.B)) {
-            actions.schedule(robot.moveToBucket());
-        }
-
-        // Open/Close Top Claw
-        if (driver.wasJustPressed(Button.Y) || operator.wasJustPressed(Button.Y)) {
-            actions.schedule(robot.controlClaw.toggleClaw());
-        }
+//        if (operator.wasJustPressed(Button.A)) {
+//            if (!robot.isExtended() && !robot.controlClaw.isCollecting()) {
+//                actions.schedule(robot.extendCollection());
+//            } else {
+//                actions.schedule(robot.passthrough());
+//            }
+//        }
+//
+//        // Toggle the top claw between scoring and collecting
+//        if (operator.wasJustPressed(Button.X)) {
+//            if (robot.isInScoringMode() && !robot.isExtended()) {
+//                actions.schedule(robot.scoreSpecimen());
+//            } else {
+//                actions.schedule(robot.moveToScore());
+//            }
+//        }
+//
+//        if (operator.wasJustPressed(Button.B)) {
+//            actions.schedule(robot.moveToBucket());
+//        }
+//
+//        // Open/Close Top Claw
+//        if (driver.wasJustPressed(Button.Y) || operator.wasJustPressed(Button.Y)) {
+//            actions.schedule(robot.controlClaw.toggleClaw());
+//        }
 
         // Reset Top Arm to starting positions
         if (operator.wasJustPressed(Button.BACK)) {

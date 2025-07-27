@@ -74,7 +74,7 @@ public class CollectionClaw implements Subsystem, TelemetryObservable {
         leftElbow.setDirection(Servo.Direction.REVERSE);
         rightElbow.setDirection(Servo.Direction.FORWARD);
 
-        setElbowPositions(ElbowState.PASSTHROUGH.position);
+        setElbowPositions(0.85);
         claw.setPosition(ClawState.OPEN.position);
         pivot.setPosition(PivotState.ONEEIGHTY.position);
         pivotStates.setSelected(5); // Set the selected pivot state to the one at the fifth index
