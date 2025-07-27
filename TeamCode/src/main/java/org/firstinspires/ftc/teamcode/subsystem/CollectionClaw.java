@@ -45,7 +45,7 @@ public class CollectionClaw implements Subsystem, TelemetryObservable {
     }
 
     public enum ElbowState {
-        PASSTHROUGH(0.85),
+        PASSTHROUGH(0.45),
         HOVER(0.22),
         ACTIVE(0.17);
 

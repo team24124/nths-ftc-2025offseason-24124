@@ -18,7 +18,7 @@ public class Arm implements Subsystem, TelemetryObservable {
         HOME(0),
         PASSTHROUGH(170),
         SCORE(300),
-        WALL(-1200), // 0
+        WALL(-800), // 0
         ACTIVE(-400);
 
         public final int position;

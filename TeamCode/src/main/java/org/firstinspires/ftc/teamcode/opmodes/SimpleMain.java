@@ -121,6 +121,7 @@ public class SimpleMain extends OpMode {
         if(gamepad2.xWasPressed()){
             collectionClaw.setElbowPositions(CollectionClaw.ElbowState.PASSTHROUGH.position);
             extension.setExtension(0.2);
+            extension.setExtension(Extension.State.RETRACTED);
         }
 
         if(gamepad2.bWasPressed()){
@@ -148,6 +149,7 @@ public class SimpleMain extends OpMode {
 
 
         slides.periodic();
+        driveTrain.periodic();
 
         // Limelight
         if (limelight.isRunning() && limelight.getLatestResult() != null) { //everything in this if statement goes into teleop
@@ -167,20 +169,21 @@ public class SimpleMain extends OpMode {
 
             if (gamepad1.aWasPressed()) toggleSearch = !toggleSearch;
 
+            LIMELIGHT:
             if (limelight.getLatestResult().getPythonOutput() != null && limelight.getLatestResult().getPythonOutput()[0] == 1 && toggleSearch) {
                 double[] array = limelight.getLatestResult().getPythonOutput();
                 double targetX = array[1];
                 double targetY = array[2];
                 double angle = array[3];
-                double strafeX = (targetX - 471) * kP;
-                double strafeY = (targetY - 270) * kP;
-                while (targetX < 466 || targetX > 476 || targetY < 265 || targetY > 275) {
+                double strafeX = (targetX - 497) * kP;
+                double strafeY = (targetY - 279) * kP;
+                while ((targetX < 492 || targetX > 502 || targetY < 274 || targetY > 284) && toggleSearch) {
                     array = limelight.getLatestResult().getPythonOutput();
                     targetX = array[1];
                     targetY = array[2];
                     angle = array[3];
-                    strafeX = (targetX - 471) * kP;
-                    strafeY = (targetY - 270) * kP;
+                    strafeX = (targetX - 497) * kP;
+                    strafeY = (targetY - 279) * kP;
 
                     if (array[0] == 0) break;
 
@@ -195,19 +198,19 @@ public class SimpleMain extends OpMode {
 
                     // Calculate the power for each wheel
                     double frontLeftPower = -strafeY + strafeX + baseX - baseY;
-                    double frontRightPower = strafeY - strafeX - baseX - baseY;
+                    double frontRightPower = -strafeY - strafeX - baseX - baseY;
                     double backLeftPower = -strafeY - strafeX - baseX - baseY;
                     double backRightPower = -strafeY + strafeX + baseX - baseY;
                     // Set the motor powers
                     driveTrain.setDrivePowers(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
 
-                    if (gamepad1.xWasPressed()) {
+                    if (gamepad1.aWasPressed()) {
                         toggleSearch = false;
                         driveTrain.setDrivePowers(0, 0, 0, 0);
-                        break;
+                        break LIMELIGHT;
                     }
 
-                    if (targetX > 466 && targetX < 476 && targetY > 265 && targetY < 275) { //change servo movements here to what you want
+                    if (targetX > 492 && targetX < 502 && targetY > 274 && targetY < 284) { //change servo movements here to what you want
                         driveTrain.setDrivePowers(0, 0, 0, 0); //keep motor powers
 
                         extension.setExtension(0.8);
