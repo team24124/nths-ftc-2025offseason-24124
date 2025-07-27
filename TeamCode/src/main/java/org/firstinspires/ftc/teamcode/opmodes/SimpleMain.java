@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 
 import com.acmerobotics.roadrunner.Pose2d;
@@ -28,6 +29,8 @@ public class SimpleMain extends OpMode {
     private Slides slides;
     private Arm arm;
     private Limelight3A limelight;
+    ElapsedTime time;
+    long duration = 3000;
 
     private boolean isClawOpen;
 
@@ -42,6 +45,8 @@ public class SimpleMain extends OpMode {
         collectionClaw = new CollectionClaw(hardwareMap);
         slides = new Slides(hardwareMap);
         arm = new Arm(hardwareMap);
+
+        time = new ElapsedTime();
 
         isClawOpen = true;
         collectionClaw.setClaw(CollectionClaw.ClawState.OPEN.position);
@@ -174,7 +179,8 @@ public class SimpleMain extends OpMode {
                 double angle = array[3];
                 double strafeX = (targetX - 471) * kP;
                 double strafeY = (targetY - 270) * kP;
-                while (targetX < 466 || targetX > 476 || targetY < 265 || targetY > 275) {
+                while ((targetX < 466 || targetX > 476 || targetY < 265 || targetY > 275)  && time.seconds() < 3) {
+
                     array = limelight.getLatestResult().getPythonOutput();
                     targetX = array[1];
                     targetY = array[2];
@@ -195,17 +201,17 @@ public class SimpleMain extends OpMode {
 
                     // Calculate the power for each wheel
                     double frontLeftPower = -strafeY + strafeX + baseX - baseY;
-                    double frontRightPower = strafeY - strafeX - baseX - baseY;
+                    double frontRightPower = -strafeY - strafeX - baseX - baseY;
                     double backLeftPower = -strafeY - strafeX - baseX - baseY;
                     double backRightPower = -strafeY + strafeX + baseX - baseY;
                     // Set the motor powers
                     driveTrain.setDrivePowers(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
 
-                    if (gamepad1.xWasPressed()) {
-                        toggleSearch = false;
-                        driveTrain.setDrivePowers(0, 0, 0, 0);
-                        break;
-                    }
+                    //if (gamepad1.x) {
+                    //    toggleSearch = false;
+                    //    driveTrain.setDrivePowers(0, 0, 0, 0);
+                    //    break;
+                    //}
 
                     if (targetX > 466 && targetX < 476 && targetY > 265 && targetY < 275) { //change servo movements here to what you want
                         driveTrain.setDrivePowers(0, 0, 0, 0); //keep motor powers
