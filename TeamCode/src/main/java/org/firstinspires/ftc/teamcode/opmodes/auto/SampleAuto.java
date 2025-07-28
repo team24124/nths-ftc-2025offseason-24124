@@ -25,24 +25,6 @@ public class SampleAuto extends LinearOpMode {
         Actions.runBlocking(
                 robot.driveTrain.getDrive().actionBuilder(beginPose)
                         // Deposit preloaded Sample
-                        .splineToLinearHeading(new Pose2d(-48, -50, Math.toRadians(45)), Math.toRadians(225))
-                        .waitSeconds(4)
-
-                        // Grab Sample
-                        .splineToLinearHeading(new Pose2d(-48, -44, Math.toRadians(90)), Math.toRadians(90))
-                        .waitSeconds(2)
-
-                        // Deposit in High Bucket
-                        .splineToLinearHeading(new Pose2d(-48, -50, Math.toRadians(45)), Math.toRadians(225))
-                        .waitSeconds(4)
-
-                        // Grab Sample
-                        .splineToLinearHeading(new Pose2d(-52, -44, Math.toRadians(90)), Math.toRadians(90))
-                        .waitSeconds(2)
-
-                        // Deposit in High Bucket
-                        .splineToLinearHeading(new Pose2d(-48, -50, Math.toRadians(45)), Math.toRadians(225))
-                        .waitSeconds(4)
                         .build());
     }
 }

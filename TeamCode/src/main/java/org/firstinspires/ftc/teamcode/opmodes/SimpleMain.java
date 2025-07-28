@@ -39,7 +39,7 @@ public class SimpleMain extends OpMode {
 
     @Override
     public void init() {
-        driveTrain = new FieldCentricDriveTrain(hardwareMap,
+        driveTrain = new RobotCentricDriveTrain(hardwareMap,
                 new Pose2d(0, 0, Math.toRadians(0)));
         extension = new Extension(hardwareMap);
         collectionClaw = new CollectionClaw(hardwareMap);
@@ -50,6 +50,7 @@ public class SimpleMain extends OpMode {
 
         isClawOpen = true;
         collectionClaw.setClaw(CollectionClaw.ClawState.OPEN.position);
+        collectionClaw.setElbowPosition(0.85);
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         if (limelight.getStatus().getPipelineIndex() != 2) {
@@ -153,6 +154,7 @@ public class SimpleMain extends OpMode {
 
 
         slides.periodic();
+        driveTrain.periodic();
 
         // Limelight
         if (limelight.isRunning() && limelight.getLatestResult() != null) { //everything in this if statement goes into teleop
@@ -180,7 +182,8 @@ public class SimpleMain extends OpMode {
                 double angle = array[3];
                 double strafeX = (targetX - 497) * kP;
                 double strafeY = (targetY - 279) * kP;
-                while ((targetX < 492 || targetX > 502 || targetY < 274 || targetY > 284) && toggleSearch) {
+                time.reset();
+                while (((targetX < 492 || targetX > 502 || targetY < 274 || targetY > 284) && time.milliseconds() < duration)) {
                     array = limelight.getLatestResult().getPythonOutput();
                     targetX = array[1];
                     targetY = array[2];
@@ -217,7 +220,13 @@ public class SimpleMain extends OpMode {
                         driveTrain.setDrivePowers(0, 0, 0, 0); //keep motor powers
 
                         extension.setExtension(0.8);
+                        try {
+                            sleep(500);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
                         collectionClaw.setElbowPositions(CollectionClaw.ElbowState.ACTIVE.position);
+
                         //right tilted block is 90 to 180:  //
                         //left tilted block is 0 to 90:  \\
                         collectionClaw.setPivot(0.82 - (((double) 0.67 / 180) * angle));  //if ll is attached static
